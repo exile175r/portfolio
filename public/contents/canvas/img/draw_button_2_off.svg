@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="43" height="40" viewBox="0 0 43 40">
+    <g transform="translate(-305 -2016)" style="opacity:.499">
+        <rect width="43" height="40" rx="5" transform="translate(305 2016)" style="fill:#fff;opacity:.102"/>
+        <g data-name="Group 656" transform="translate(318 2027)">
+            <path data-name="Path 8482" d="M7.25 14.594V10.2a.948.948 0 0 1 .95-.95h3.789a.948.948 0 0 1 .947.947v4.4" transform="translate(-1.092 -1.197)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <path data-name="Path 8483" d="M12.442 9.12V5.389a.473.473 0 0 0-.65-.44L8.1 6.425a.237.237 0 0 0-.149.22v2.422" transform="translate(-1.129 -.969)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <circle data-name="Ellipse 36" cx="9" cy="9" r="9" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <path data-name="Path 8484" d="M14.882 18.018a3.481 3.481 0 0 0-3.482-3.445H8.552a3.481 3.481 0 0 0-3.479 3.445" transform="translate(-.978 -1.478)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+        </g>
+    </g>
+</svg>

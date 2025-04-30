@@ -4,6 +4,19 @@ const nextConfig = {
     domains: [
       'www.notion.so'
     ]
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          }
+        ],
+      },
+    ]
   }
 };
 

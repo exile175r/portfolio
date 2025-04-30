@@ -1,8 +1,8 @@
+// 데이터 페칭을 위한 서버 컴포넌트
 import {DATABASE_ID, TOKEN} from "../../config";
-import ProjectItem from "./project-item";
+import ProjectContent from "./project-content";
 
 export default async function Page() {
-
   const options = {
     method: 'POST',
     headers: {
@@ -14,7 +14,7 @@ export default async function Page() {
     body: JSON.stringify({
       sorts: [
         {
-          "property": "이름",
+          "property": "order",
           "direction": "ascending"
         }
       ],
@@ -23,19 +23,7 @@ export default async function Page() {
   };
 
   const res = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, options);
-
   const projects = await res.json();
 
-  // console.log(projects)
-
-  return(
-    <div className="flex flex-col items-center justify-center min-h-screen xp-5 mb-10">
-      <h2 className="ml-6 text-4xl font-bold sm:text-6ml">총 프로젝트 : {projects.results.length}</h2>
-      <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full">
-        {projects.results.map((aProject)=>{
-          return <ProjectItem key={aProject.id} data={aProject} />
-        })}
-      </div>
-    </div>
-  );
+  return <ProjectContent projects={projects} />;
 }

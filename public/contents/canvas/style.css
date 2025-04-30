@@ -1,0 +1,558 @@
+@charset "utf-8";
+
+* {margin: 0;padding: 0;box-sizing: border-box;user-select: none;}
+h1, h2, h3, h4, h5, h6 {font-size:1em;font-weight:normal;}
+ul, ol, li {list-style-type:none;}
+img {vertical-align:middle;pointer-events:none;}
+label, input, select, textarea, button {vertical-align:middle;}
+label, button {cursor:pointer;}
+strong, em {font-weight:normal;font-style: normal;}
+button {background-color: transparent;outline: none;border: none;}
+textarea {background-color: transparent;border: none;outline: none;resize: none;line-height:1;}
+input {background-color: transparent;border: none;outline: none;line-height:1;}
+
+.hide {display: none;}
+.hidden {opacity: 0;pointer-events: none;}
+.eNone {pointer-events: none;}
+
+body {
+  margin:0;
+  height: 100vh;
+  background-color: #000;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#wrap {
+  width: 1280px;
+  height: 800px;
+  transform-origin: 0 0;
+  position: relative;
+}
+
+#canvasBox {
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+}
+#highlightCanvas {opacity: .5;}
+
+#figure {width: 100%;height: 100%;position: absolute;left: 0;top: 0;}
+#figure line {
+  stroke-linecap: round;
+}
+#figure polygon {
+  transform-origin: var(--ox) var(--oy);
+  transform: translate(calc(var(--x)*1px), calc(var(--y)*1px)) rotate(var(--r));
+}
+#figure .arrow rect:last-child {
+  transform-origin: var(--ox) var(--oy);
+  transform: rotate(var(--r));
+}
+#figure .rect rect {
+  transform: scaleX(var(--rsx)) scaleY(var(--rsy));
+  transform-origin: center;
+}
+#figure ellipse {
+  transform: scaleX(var(--esx)) scaleY(var(--esy));
+}
+
+#figure :not(.on) .re,
+#figure :not(.on) .reBox,
+#figure :not(.on) .rotate {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#figure .line .re:hover,
+#figure .arrow .re:hover {cursor: ew-resize;}
+
+#figure .rect .re:nth-child(2):hover,
+#figure .rect .re:nth-child(5):hover,
+#figure .ellipse .re:nth-of-type(2):hover,
+#figure .ellipse .re:nth-of-type(5):hover {cursor: nw-resize;}
+
+#figure .rect .re:nth-child(3):hover,
+#figure .rect .re:nth-child(4):hover,
+#figure .ellipse .re:nth-of-type(3):hover,
+#figure .ellipse .re:nth-of-type(4):hover {cursor: sw-resize;}
+
+#figure .ellipse .reBox {
+  transform: scaleX(var(--esx)) scaleY(var(--esy));
+}
+
+#drawTool {
+  padding: 20px 0;
+  width: 300px;
+  background-color: #191d2c;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.16);
+  color: #fff;
+  position: absolute;
+  right: 125px;
+  bottom: 25px;
+  z-index: 1;
+}
+
+#drawTool h2 {
+  margin-bottom: 20px;
+  padding-left: 20px;
+  pointer-events: none;
+}
+
+#drawTool p {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+#drawTool ul {
+  display: flex;
+}
+
+#drawTool li {
+  cursor: pointer;
+}
+
+#drawTool .tab {
+  display: flex;
+}
+
+#drawTool .tab button {
+  padding-bottom: 10px;
+  flex: 1;
+  border-bottom: 1px solid #fff;
+  opacity: .2;
+}
+
+#drawTool .tab button.on {
+  opacity: 1;
+  pointer-events: none;
+}
+
+#drawTool [class^="draw"],
+#drawTool [class^="text"] {
+  padding: 20px;
+  position: relative;
+}
+
+#drawTool [class^="draw"]:not(.drawColor):after,
+#drawTool [class^="text"]:after {
+  content: '';
+  position: absolute;
+  inset: auto 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+}
+
+#drawTool .drawBack ul {
+  justify-content: space-between;
+}
+
+#drawTool .drawBack li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 125px;
+  height: 38px;
+  border: 1px solid #fff;
+  border-radius: 38px;
+  opacity: .2;
+}
+
+#drawTool .drawBack li.on {
+  opacity: 1;
+  pointer-events: none;
+}
+
+#drawTool .drawToolSelect {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  row-gap: 15px;
+  justify-content: space-between;
+}
+
+#drawTool .drawToolSelect span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: fit-content;
+  font-size: 12px;
+}
+
+#drawTool .drawToolSelect span button {
+  margin-bottom: 5px;
+  width: 42px;
+  height: 40px;
+  background-color: rgba(255,255,255,.05);
+  border-radius: 5px;
+  position: relative;
+}
+
+#drawTool .drawToolSelect span button:before {
+  content: '';
+  margin: auto;
+  background: 0 0 no-repeat;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+#drawTool .drawToolSelect span:nth-child(1) button:before {
+  background-image: url(img/draw_button_1_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(2) button:before {
+  background-image: url(img/draw_button_2_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(3) button:before {
+  background-image: url(img/draw_button_3_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(4) button:before {
+  background-image: url(img/draw_button_4_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(5) button:before {
+  background-image: url(img/draw_button_5_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(6) button:before {
+  background-image: url(img/draw_button_6_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(7) button:before {
+  background-image: url(img/draw_button_7_on.svg);
+}
+#drawTool .drawToolSelect span:nth-child(8) button:before {
+  background-image: url(img/draw_button_8_on.svg);
+}
+
+#drawTool .drawToolSelect span button:not(.on):hover:before,
+#drawTool .drawToolSelect span button.on:before {
+  opacity: 1;
+}
+
+#drawTool .drawThickness li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,.1);
+  position: relative;
+}
+
+#drawTool .drawThickness li:before {
+  content: '';
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+#drawTool .drawThickness li.on:before {
+  background-color: #3979e1;
+}
+
+#drawTool .drawThickness li:nth-child(1):before {
+  width: 10px;
+  height: 10px;
+}
+
+#drawTool .drawThickness li:nth-child(2):before {
+  width: 16px;
+  height: 16px;
+}
+
+#drawTool .drawThickness li:nth-child(3):before {
+  width: 20px;
+  height: 20px;
+}
+
+#drawTool .drawThickness li:nth-child(4):before {
+  width: 30px;
+  height: 30px;
+}
+
+#drawTool .drawThickness ul {
+  gap: 10px;
+}
+
+#drawTool .drawColor {
+    padding-bottom: 10px;
+}
+#drawTool .drawColor ul {justify-content: space-between;}
+#drawTool .drawColor li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    border: solid 1px #b5b5b5;
+    border-radius: 50%;
+    position: relative;
+}
+#drawTool .drawColor li:nth-child(1) {
+    background-color: #ff1d1d;
+}
+#drawTool .drawColor li:nth-child(2) {
+    background-color: #ffff54;
+}
+#drawTool .drawColor li:nth-child(3) {
+    background-color: #4fad5b;
+}
+#drawTool .drawColor li:nth-child(4) {
+    background-color: #216cc6;
+}
+#drawTool .drawColor li:nth-child(5) {
+    background-color: #000;
+}
+#drawTool .drawColor li:nth-child(6),
+#drawTool .drawColor li:nth-child(7),
+#drawTool .drawColor li:nth-child(8),
+#drawTool .drawColor li:nth-child(9) {
+    background-color: #b5b5b5;
+}
+#drawTool .drawColor li.on:before {
+  content: '';
+  margin: auto;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  position: absolute;
+  inset: -3px;
+}
+
+#drawTool .colorPicker {
+  --hue: 0deg;
+  padding: 0 20px;
+  position: relative;
+}
+
+#drawTool:not(.hidden) .colorPicker.hidden {
+  height: 0;
+}
+
+#drawTool .colorPicker .cp_color_plate {
+  margin-bottom: 10px;
+  height: 80px;
+  background: linear-gradient(0, #000, transparent), linear-gradient(90deg, #fff, hsl(var(--hue, 0) 100% 50%));
+  border-radius: 5px;
+  position: relative;
+  overflow: hidden;
+}
+
+#drawTool .colorPicker input[type="range"]#hue {
+  display: block;
+  width: 100%;
+  height: 14px;
+  border: solid 1px rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  -webkit-appearance: none;
+  position: relative;
+  cursor: pointer;
+}
+
+#drawTool input[type="range"]#hue::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: 3px;
+  width: 8px;
+  height: 8px;
+  background-color: hsl(var(--hue, 0) 100% 50%);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(100, 100, 100, 0.2);
+}
+
+#drawTool input[type="range"]#hue::-webkit-slider-runnable-track {
+  height: 14px;
+  background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%));
+  box-shadow: inset 0 0 5px #fff, inset 0 0 1px #fff;
+  border-radius: 20px;
+}
+
+#drawTool .cp_color_plate:before {
+  content: '';
+  margin: -5px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.4);
+  transform: translate(var(--x), var(--y));
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#drawTool .close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.transparency {margin: 0 auto;padding: 0 15px;display: flex;align-items: center;width: 639px;height: 60px;background-color: rgba(17, 20, 31, .8);border-radius: 60px;color: #fff;position: fixed;inset: auto 0 25px;}
+
+.transparency input[type="range"]#gauge {
+  margin: 0 10px;
+  flex: 1;
+  height: 10px;
+  border-radius: 10px;
+  -webkit-appearance: none;
+  position: relative;
+  cursor: pointer;
+  background-color: #11141f;
+  background-image: linear-gradient(#3a7ce6, #3a7ce6);
+  background-size: 0 100%;
+  background-repeat: no-repeat;
+}
+
+#drawTool input[type="range"]#gauge::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  background-color: #fff;
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
+}
+
+#drawTool input[type="range"]#gauge::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
+}
+
+#drawTool .textAdd button {
+  margin-bottom: 10px;
+  width: 260px;
+  height: 38px;
+  border: 1px solid #fff;
+  border-radius: 38px;
+  font-size: 32px;
+  color: #fff;
+}
+
+#drawTool .textAdd button:hover {
+  background-color: rgba(255,255,255,.4);
+}
+
+#drawTool .textAdd p:last-child {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+#drawTool .textSetting select {
+  margin-bottom: 10px;
+  padding-left: 10px;
+  width: 260px;
+  height: 38px;
+  background-color: #484d5f;
+  border-radius: 5px;
+  border: 0;
+  color: #fff;
+  outline: none;
+}
+
+#drawTool .textSetting div {
+  display: flex;
+  gap: 5px;
+  color: #fff;
+}
+
+#drawTool .textSetting div > * {
+  height: 38px;
+  border-radius: 5px;
+}
+
+#drawTool .textSetting div input {
+  display: none;
+}
+
+#drawTool .textSetting div button,
+#drawTool .textSetting div label {
+  background-color: rgba(255,255,255,.1);
+  color: #fff;
+}
+
+#drawTool .textSetting div label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#drawTool .textSetting div #textStyle1:checked ~ [data-text="bold"],
+#drawTool .textSetting div #textStyle2:checked ~ [data-text="italic"],
+#drawTool .textSetting div #textStyle3:checked ~ [data-text="underline"],
+#drawTool .textSetting div button:active {
+  background-color: #397be3;
+}
+
+#drawTool .textSetting div [data-text="down"], #drawTool .textSetting div [data-text="up"] {
+  width: 28px;
+  font-size: 26px;
+}
+
+#drawTool .textSetting div [data-text="bold"], #drawTool .textSetting div [data-text="italic"], #drawTool .textSetting div [data-text="underline"] {
+  width: 38px;
+  font-size: 18px;
+}
+
+#drawTool .textSetting div [data-text="up"] {
+  margin-right: 5px;
+}
+
+#drawTool .textSetting div [data-text="bold"] {
+    font-weight: bold;
+}
+
+#drawTool .textSetting div [data-text="italic"] {
+    font-style: italic;
+}
+
+#drawTool .textSetting div [data-text="underline"] {
+  text-decoration: underline;
+}
+
+#drawTool .textSetting div span {
+  width: 50px;
+  background-color: #484d5f;
+  text-align: center;
+  line-height: 38px;
+}
+
+#textBox {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+#textBox .text,
+#textBox .text > *:not(textarea) {
+  position: absolute;
+}
+#textBox .text {padding: 20px 20px 10px;width: 360px;height: 70px;border: 1.5px solid #e3e3e3;}
+#textBox .text textarea {padding-right: 3px;width: 100%;height: 100%;font-size: 12px;color: #fff;line-height: 12px;}
+#textBox .text button {
+  right: -15px;
+  top: -15px;
+}
+#textBox .text .resize,
+#textBox .text .rotate {
+  width: fit-content;
+  height: fit-content;
+}
+#textBox .text .resize {
+  right: -15px;
+  bottom: -15px;
+}
+#textBox .text .rotate {margin: auto;inset: -15px 0 auto;cursor: all-scroll;}
+/* #textBox .text:not(.on) {
+  border-color: transparent;
+} */
+#textBox .text:not(.on) button,
+#textBox .text:not(.on) .resize,
+#textBox .text:not(.on) .rotate {
+  pointer-events: none;
+  opacity: 0;
+}

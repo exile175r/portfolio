@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="19.5" height="19.5" viewBox="0 0 19.5 19.5">
+    <path data-name="Path 8478" d="m6.719 12.75 3.031-6 3.031 6" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+    <path data-name="Line 248" transform="translate(7.477 11.266)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M0 0h4.555"/>
+    <g data-name="Group 645">
+        <g data-name="Group 650">
+            <path data-name="Line 249" transform="translate(2.75 4.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M0 0v10"/>
+        </g>
+    </g>
+    <path data-name="Line 250" transform="translate(16.75 4.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M0 10V0"/>
+    <g data-name="Group 647">
+        <g data-name="Group 649">
+            <rect data-name="Rectangle 206" width="4" height="4" rx="1" transform="translate(14.75 14.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <rect data-name="Rectangle 207" width="4" height="4" rx="1" transform="translate(.75 14.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <rect data-name="Rectangle 208" width="4" height="4" rx="1" transform="translate(14.75 .75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <rect data-name="Rectangle 209" width="4" height="4" rx="1" transform="translate(.75 .75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px"/>
+            <path data-name="Line 251" transform="translate(4.75 16.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M0 0h10"/>
+            <path data-name="Line 252" transform="translate(4.75 2.75)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M10 0H0"/>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+    <html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../common/css/common.css">
+        <link rel="stylesheet" href="../common/css/reset.css">
+        <link rel="stylesheet" href="../common/css/font.css">
+        <link rel="stylesheet" href="./css/main.css">
+        <script src="../common/js/common.js"></script>
+        <script src="js/main.js"></script>
+        <script>
+            const arr = {
+                bingo: ['not bad','very well','I\'m fine.','This is ~.','Good morning.','not so good','Good evening.'],
+                drag: ['not bad','very well','I\'m fine.','This is ~.','Good morning.','not so good','Good evening.','These are ~.','Good afternoon.'],
+                quiz: ['나쁘지 않은','매우 좋은','좋아.','이 사람은 ~이다.','안녕. (아침 인사)','별로 좋지 않은','안녕. (저녁 인사)']
+            }
+        </script>
+        <title></title>
+    </head>
+    <body>
+        <div class="wrap">
+            <img src="./image/bg_quizB.webp" class="mainBg">
+            <main>
+                <button class="bgmBtn">
+                    <img src="./image/bgm_off.webp" class="bgmOff">
+                    <img src="./image/bgm_on.webp" class="bgmOn">
+                </button>
+                <div class="dropArea">
+                    <div class="bingo">
+                        <div class="arrow arrow1" data-type="row"><img src="./image/arrow1.webp"></div>
+                        <div class="arrow arrow1" data-type="row"><img src="./image/arrow1.webp"></div>
+                        <div class="arrow arrow1" data-type="row"><img src="./image/arrow1.webp"></div>
+                        <div class="arrow arrow2" data-type="col"><img src="./image/arrow2.webp"></div>
+                        <div class="arrow arrow2" data-type="col"><img src="./image/arrow2.webp"></div>
+                        <div class="arrow arrow2" data-type="col"><img src="./image/arrow2.webp"></div>
+                        <div class="arrow arrow3" data-type="diag"><img src="./image/arrow2.webp"></div>
+                        <div class="arrow arrow3" data-type="diag"><img src="./image/arrow2.webp"></div>
+                        <p class="bingoEff"><img src="./image/bingo.webp"></p>
+                    </div>
+                    <ul>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                        <li data-drop><span></span><img src="./image/answer_circle.webp" class="circle"></li>
+                    </ul>
+                </div>
+                <div class="dragArea">
+                    <ul>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                        <li><span></span></li>
+                    </ul>
+                </div>
+                <div class="cat">
+                    <p class="catImg">
+                        <img src="./image/cat_quiz.webp">
+                        <img src="./image/cat_answer.webp">
+                        <img src="./image/cat_info.webp">
+                    </p>
+                    <p class="textBox">
+                        <span></span>
+                        <em>One Bingo!</em>
+                        <em>Two Bingo!</em>
+                        <em>Three Bingo!</em>
+                        <em>Four Bingo!</em>
+                        <em>Five Bingo!</em>
+                    </p>
+                </div>
+                <img class="finger" src="./image/finger.webp">
+                <button class="nextStep hidden">다음<br>학습으로!</button>
+            </main>
+        </div>
+        <div id="blind" class="hide"></div>
+    </body>
+</html>

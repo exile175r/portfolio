@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+    <g data-name="Ellipse 41" style="fill:#f2f2f2;stroke:#e3e3e3">
+        <circle cx="15" cy="15" r="15" style="stroke:none"/>
+        <circle cx="15" cy="15" r="14.5" style="fill:none"/>
+    </g>
+    <g data-name="Group 713">
+        <g data-name="Group 718">
+            <path data-name="Line 269" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="M0 0v7.778" transform="translate(9.556 11.111)"/>
+        </g>
+    </g>
+    <path data-name="Line 270" transform="translate(20.444 11.111)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="M0 7.778V0"/>
+    <g data-name="Group 715">
+        <g data-name="Group 717" transform="translate(8 8)">
+            <rect data-name="Rectangle 372" width="3.111" height="3.111" rx="1" transform="translate(10.889 10.889)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <rect data-name="Rectangle 373" width="3.111" height="3.111" rx="1" transform="translate(0 10.889)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <rect data-name="Rectangle 374" width="3.111" height="3.111" rx="1" transform="translate(10.889)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <rect data-name="Rectangle 375" width="3.111" height="3.111" rx="1" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none"/>
+            <path data-name="Line 271" transform="translate(3.111 12.444)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="M0 0h7.778"/>
+            <path data-name="Line 272" transform="translate(3.111 1.556)" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="M7.778 0H0"/>
+        </g>
+    </g>
+</svg>

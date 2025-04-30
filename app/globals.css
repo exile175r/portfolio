@@ -17,3 +17,23 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 프로젝트 아이템 정보 스타일 */
+.projectItem .info {
+  padding: 6px 10px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, .5);
+  border-left: 1px solid rgba(0, 0, 0, .5);
+  border-right: 1px solid rgba(0, 0, 0, .5);
+}
+.projectItem .info h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+.projectItem .info p {
+  margin-bottom: 6px;
+  min-height: 48px;
+}
+.projectItem .info ul li {
+  padding: 0 6px;
+  border-radius: 4px;
+}

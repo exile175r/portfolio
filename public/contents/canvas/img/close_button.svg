@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+    <g data-name="Ellipse 40" style="fill:#dbdbdb;stroke:#bababa">
+        <circle cx="15" cy="15" r="15" style="stroke:none"/>
+        <circle cx="15" cy="15" r="14.5" style="fill:none"/>
+    </g>
+    <g data-name="close_button">
+        <g data-name="Group 592">
+            <path data-name="Line 223" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="m0 0 10 10" transform="translate(10 10)"/>
+            <path data-name="Line 224" style="stroke:#838383;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;fill:none" d="M10 0 0 10" transform="translate(10 10)"/>
+        </g>
+    </g>
+</svg>

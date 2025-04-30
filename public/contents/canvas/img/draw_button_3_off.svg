@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="42" height="40" viewBox="0 0 42 40">
+    <g transform="translate(-305 -2016)" style="opacity:.496">
+        <rect width="42" height="40" rx="5" transform="translate(305 2016)" style="fill:#fff;opacity:.103"/>
+        <g data-name="Group 665">
+            <path data-name="Line 254" transform="translate(318 2045)" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" d="M16 0H0"/>
+            <path data-name="Path 8487" d="M4.725 15.75h3.447l8.066-8.066a1.747 1.747 0 0 0 0-2.47l-3.952-3.952a1.745 1.745 0 0 0-2.47 0L1.261 9.816a1.747 1.747 0 0 0 0 2.47z" style="fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px" transform="translate(317.25 2026.25)"/>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,87 @@
+@charset "utf-8";
+/* @import url("font.css");
+@import url("reset.css"); */
+
+* {
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    overflow: hidden;
+    line-height: 1;
+    touch-action: none;
+}
+
+#wrap {
+    position: relative;
+    width: 1280px;
+    height: 800px;
+    overflow: hidden;
+}
+
+.hide {
+    display: none !important;
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.eNone {
+    pointer-events: none !important;
+}
+
+#blind {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+}
+
+/* 완료도장 */
+.stamp {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 100;
+    /* top: 0; */
+}
+
+.stamp img {
+    position: absolute;
+    right: 40px;
+    bottom: 30px;
+    transform: scale(2);
+    animation: stampEff .5s ease-in forwards;
+}
+
+@keyframes stampEff {
+    90% {
+        transform: scale(.7);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes induce {
+    50% {
+        opacity: 1;
+    }
+}
+
+/* 반응형 */
+@media (min-width: 1334px) {
+    #wrap {
+        width: 1334px;
+    }
+}

@@ -1,0 +1,104 @@
+@charset "utf-8";
+
+/* keyframe */
+@keyframes dragDown{
+    100%{transform: translateY(250px);}
+}
+
+@keyframes arrowGo1{
+    0%{opacity: 1;}
+    100%{height: 100%; opacity: 1;}
+}
+@keyframes arrowGo2{
+    0%{ opacity: 1;}
+    100%{width: 100%; opacity: 1;}
+}
+
+@keyframes fingerMove{
+    100%{transform: translate(-70px, -160px);}
+}
+@keyframes fingerGuide{
+    0%{transform: rotate(10deg);}
+    100%{transform: rotate(-30deg);}
+}
+
+
+.wrap{display: flex; justify-content: center; align-items: center; position: relative; width: 1280px; height: 800px;margin: auto;}
+main{display: flex;justify-items: center;flex-direction: column;position: absolute;width: 100%;height: 100%;opacity: 0;transition: opacity .3s;align-items: center;}
+.mainBg{width: 1334px; height: 100%;}
+
+/* 헤더 */
+.bgmBtn{position: absolute;top: 92px;left: 747px;width: 67px;height: 68px;z-index: 2;}
+.bgmBtn>img{position: absolute;top: 0;left: 0;pointer-events: none;}
+.bgmBtn>img:nth-child(2){opacity: 0;}
+.bgmBtn.click>img:nth-child(2){opacity: 1;}
+.bgmBtn.click>img:nth-child(2) .bgmBtn>img:nth-child(1){opacity: 0;}
+
+/* dropArea */
+.dropArea{position: relative;width: 1195px;height: 500px;margin: 80px auto 0px;padding: 130px 25px 35px;background: url(../image/dropArea_bg.webp)no-repeat center/100%;}
+.dropArea ul{ display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 5px;}
+.dropArea ul>li{display: flex; justify-content: center; align-items: center; position: relative; width: 370px; height: 105px; padding: 0 10px;}
+.dropArea ul>li.on .circle{opacity: 1;}
+.dropArea .circle{position: absolute; opacity: 0;}
+ul>li>span{display: inline-block; line-height: 32px; text-align: center; text-shadow: -2px 0px #fff, 0px 2px #fff, 2px 0px #fff, 0px -2px #fff; font-size: 31px;font-family: CMS; font-weight: bold; }
+ul>li *{pointer-events: none;}
+
+/* dragArea */
+.dragArea{position: relative;bottom: -17px;width: 1196px;height: 213px;/* display: inline-block; */}
+.dragArea ul{height: 100%;width: 100%;display: flex;justify-content: center;align-items: center;flex-wrap: wrap;gap: 5px;position: absolute;padding: 10px 0 40px 0px;background: url(../image/dragArea_bg.webp)no-repeat center/ 100%;}
+.dragArea ul>li{display: flex;justify-content: center;align-items: center;width: 370px;height: 50px;}
+.dragArea ul>li>span{line-height: 30px;font-family: CMS; font-weight: bold;}
+
+/* cat */
+.cat{display: flex; align-items: center; justify-content: center; position: absolute; top: 650px; left: 270px; z-index: 1; transform: translateY(200px);transition: transform .5s;}
+.catImg{position: relative;width: 260px;height: 137px;}
+.textBox{position: relative; top: -50px; width: 541px; height: 183px; background: url(../image/bubble.webp);}
+.cat .catImg img{position: absolute; top: 0; left: 0;}
+.cat .catImg img:nth-child(1){left: -14px;}
+.cat .catImg img:nth-child(2){opacity: 0;}
+.cat .catImg img:nth-child(3){width: 275px; height: auto; top: -3px; left: -21px;}
+
+.cat .textBox>span,
+.cat .textBox>em{display: flex; justify-content: center; align-items: center;position: absolute; width:541px; height: 183px; padding-left: 15px; text-align: center;}
+.cat .textBox>span{word-break: keep-all; font-size: 60px; font-family: ONE; }
+.cat .textBox em{font-size: 60px; color: #ff0000;font-family: CMS; font-weight: bold;opacity: 0;}
+.cat .textBox>span.info{font-size: 35px; font-family: MSL; line-height: 45px; display: flex; justify-content: center; align-items: center; margin: 2px 0 0 5px;}
+
+/* cat 애니메이션  */
+.dragArea.down ul{ animation: dragDown 0.5s ease forwards;}
+.cat.quiz {transform: translateY(0);}
+.cat.answer .catImg img:nth-child(2){opacity: 1;}
+.cat.answer .textBox span{ opacity: 0;}
+.cat .textBox span.on,
+.cat .textBox em.on{ opacity: 1; }
+
+
+/* bingo */
+.bingo{display: flex; justify-content: center; align-items: center; position: absolute; bottom: 0; left: 0; width: 1195px; height: 400px;}
+.bingo .arrow{ position: absolute; z-index: 2; overflow: hidden; transform-origin: 0 0;}
+.bingo .arrow1{height: 0;}
+.bingo .arrow2,.bingo .arrow3{width: 0;}
+.arrow1.on{ animation: arrowGo1 1s ease forwards;}
+.arrow2.on,.arrow3.on{ animation: arrowGo2 1s ease forwards;}
+
+.bingoEff{position: absolute;top: -210px;left:157px;width: 768px;z-index: 5;opacity: 0;transition-delay: 1s;pointer-events: none;}
+.bingoEff.on{opacity: 1;}
+
+/* 위치 */
+.bingo .arrow1{top: 40px;}
+.bingo .arrow:nth-of-type(1){left: 183px;}
+.bingo .arrow:nth-of-type(2){left: 558px;}
+.bingo .arrow:nth-of-type(3){left: 933px;}
+.bingo .arrow2{left: 42px;}
+.bingo .arrow:nth-of-type(4){top: 45px;}
+.bingo .arrow:nth-of-type(5){top: 160px;}
+.bingo .arrow:nth-of-type(6){top: 267px;}
+.bingo .arrow:nth-of-type(7){top: 22px;left: 60px;transform: rotate(13.8deg);}
+.bingo .arrow:nth-of-type(8){top: 296px; left: 50px;transform: rotate(-13.8deg);}
+
+.finger{position: absolute;top: 450px;left:1070px;pointer-events: none;z-index: 2;opacity: 0;}
+.finger.drag{top: 620px;left:1070px;opacity: 1;}
+.finger.drag.move{animation: fingerMove 1.5s forwards; opacity: 1;}
+.finger.on {animation: fingerGuide .5s linear alternate-reverse 5;opacity: 1;}
+
+.nextStep{position: absolute; bottom: 20px; right: 20px;  width: 201px; height: 256px; padding-top: 110px; background: url(../image/next_step.webp)no-repeat center/100%; font-size: 34px; font-family: KAT; color: #fff; z-index: 11;}

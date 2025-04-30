@@ -1,0 +1,64 @@
+@charset "utf-8";
+
+@keyframes draw {
+  100% { stroke-dashoffset: 0; }
+}
+
+* {margin: 0;padding: 0;box-sizing: border-box;}
+body {
+  height: 100vh;
+  background-color: #007FBA;
+  background-image: url(./img/bg_line.svg);
+  background-position: -30px -30px;
+  background-repeat: repeat;
+  overflow: hidden;
+}
+canvas {position: absolute;inset: 0 auto auto 0;}
+
+#svgBox {
+  margin: auto;
+  background: url(./img/map.svg) center / 80% 80% no-repeat;
+  position: absolute;
+  inset: 0;
+}
+#svgBox svg {width: 100%;height: 100%;position: absolute;inset: 0;z-index: 10;pointer-events: none;}
+#svgBox svg path {fill: none;stroke-width: 8px;}
+[id^="ani-"] {
+  stroke: #fff;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  animation: draw linear reverse forwards;
+  animation-duration: var(--duration);
+}
+#btn {
+  padding: 15px 40px;
+  background-color: rgba(255,255,255,0.6);
+  box-shadow: inset 0 10px 5px rgba(0,0,0,0.05),
+              0 25px 8px rgba(0,0,0,0.05),
+              0 20px 15px rgba(0,0,0,0.05),
+              inset 0 -10px 15px rgba(255,255,255,0.5);
+  border: 0;
+  outline: 0;
+  border-radius: 50px;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #444;
+  position: absolute;
+  inset: 40px auto auto 40px;
+  cursor: pointer;
+}
+#btn:before {
+  content: '';
+  margin: auto;
+  width: 68%;
+  height: 3px;
+  background-color: rgba(255,255,255,0.3);
+  border-radius: 5px;
+  position: absolute;
+  inset: 5px 0 auto;
+}
+#btn[hidden] {
+  opacity: 0;
+  pointer-events: none;
+}

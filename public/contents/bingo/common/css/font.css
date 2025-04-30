@@ -1,0 +1,110 @@
+@charset "utf-8";
+
+/* 개발 경로 */
+@font-face {
+	font-family: NSREB;
+	src: url("../../../../../../../html/font/NanumSquareRoundEB.woff");
+}
+@font-face {
+	font-family: NSRB;
+	src: url("../../../../../../../html/font/NanumSquareRoundB.woff");
+}
+@font-face {
+	font-family: NSRR;
+	src: url("../../../../../../../html/font/NanumSquareRoundR.woff");
+}
+@font-face {
+	font-family: NGEB;
+	src: url("../../../../../../../html/font/NanumGothicEB.woff");
+}
+@font-face {
+	font-family: ONE;
+	src: url("../../../../../../../html/font/ONE-Mobile-POP.woff");
+}
+@font-face {
+	font-family: CKR;
+	src: url("../../../../../../../html/font/CookieRun-Regular.woff");
+}
+@font-face {
+	font-family: CKB;
+	src: url("../../../../../../../html/font/CookieRunBold.woff");
+}
+@font-face {
+	font-family: MSL;
+	src: url("../../../../../../../html/font/Maplestory-Light.woff");
+}
+@font-face {
+	font-family: MSR;
+	src: url("../../../../../../../html/font/Maplestory-Light.woff");
+}
+@font-face {
+	font-family: MSB;
+	src: url("../../../../../../../html/font/Maplestory-Bold.woff");
+}
+@font-face {
+	font-family: CMS;
+	src: url("../../../../../../../html/font/ComicSansMS3.woff");
+}
+@font-face {
+	font-family: KAT;
+	src: url("../../../../../../../html/font/KATURI.woff");
+}
+@font-face {
+	font-family: NSKR;
+	src: url("../../../../../../../html/font/NotoSansKR-Regular.woff");
+}
+@font-face {
+	font-family: YTEXT;
+	src: url("../../../../../../../html/font/Maplestory-Light.woff");
+	unicode-range: U+0059;
+}
+/* @font-face {
+	font-family: CMS;
+	src: url("./font/ComicSansMS3.woff");
+} */
+
+/* 고객사 경로 */
+@font-face {
+	font-family: NSREB;
+	src: url("../../../../../../../../html/font/NanumSquareRoundEB.woff");
+}
+@font-face {
+	font-family: NSRB;
+	src: url("../../../../../../../../html/font/NanumSquareRoundB.woff");
+}
+@font-face {
+	font-family: NSRR;
+	src: url("../../../../../../../../html/font/NanumSquareRoundR.woff");
+}
+@font-face {
+	font-family: NGEB;
+	src: url("../../../../../../../../html/font/NanumGothicEB.woff");
+}
+@font-face {
+	font-family: ONE;
+	src: url("../../../../../../../../html/font/ONE-Mobile-POP.woff");
+}
+@font-face {
+	font-family: CKR;
+	src: url("../../../../../../../../html/font/CookieRun-Regular.woff");
+}
+@font-face {
+	font-family: MSL;
+	src: url("../../../../../../../../html/font/Maplestory-Light.woff");
+}
+@font-face {
+	font-family: MSB;
+	src: url("../../../../../../../../html/font/Maplestory-Bold.woff");
+}
+@font-face {
+	font-family: CMS;
+	src: url("../../../../../../../../html/font/ComicSansMS3.woff");
+}
+@font-face {
+	font-family: KAT;
+	src: url("../../../../../../../../html/font/KATURI.woff");
+}
+@font-face {
+	font-family: NSKR;
+	src: url("../../../../../../../../html/font/NotoSansKR-Bold.woff");
+}

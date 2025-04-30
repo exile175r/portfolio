@@ -1,0 +1,204 @@
+@keyframes opacity {
+  0% {opacity: .8;}
+  100% {opacity: 0;}
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  /* max-width: 1000px; */
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  /* border-radius: 10px; */
+  background-color: #000;
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+}
+
+#screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+#screen i {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 150px;
+  height: 150px;
+  background-color: #000;
+  border-radius: 50%;
+  font-size: 90px;
+  color: #fff;
+}
+
+#screen:not(.on) i {opacity: 0;}
+
+#screen.on i {
+  animation: opacity 1.3s forwards;
+}
+
+#screen i.fa-play:before {
+  transform: translateX(7px);
+}
+
+.controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-container:hover .controls {
+  opacity: 1;
+}
+
+/* 타임라인 스타일링 */
+.timeline-container {
+  width: 100%;
+  height: 5px;
+  /* background-color: rgba(255, 255, 255, 0.2); */
+  cursor: pointer;
+  position: relative;
+}
+
+.timeline {
+  /* -webkit-appearance: none; */
+  width: 100%;
+  height: 5px;
+  background: transparent;
+  outline: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.timeline::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.timeline::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* 컨트롤 버튼 컨테이너 */
+.controls-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0 10px;
+}
+
+/* 버튼 공통 스타일 */
+.control-btn {
+  width: 35px;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+  transform: scale(1.1);
+}
+
+.control-btn i {
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.control-btn.play {
+  width: 25px;
+}
+
+/* 볼륨 컨트롤 */
+.volume-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volume {
+  /* -webkit-appearance: none; */
+  width: 80px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+}
+
+.volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* 시간 표시 */
+.time-display {
+  color: white;
+  font-size: 14px;
+  font-family: monospace;
+  min-width: 100px;
+  text-align: center;
+}
+
+/* 우측 컨트롤 */
+.right-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 반응형 조정 */
+@media (max-width: 768px) {
+  .volume-container {
+    display: none;
+  }
+  
+  .time-display {
+    min-width: 80px;
+    font-size: 12px;
+  }
+  
+  .control-btn i {
+    font-size: 18px;
+  }
+} 
