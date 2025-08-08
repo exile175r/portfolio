@@ -9,13 +9,17 @@ function loadSampleVideo() {
       return res.blob();
     })
     .then(blob => {
+      if (blob.type !== 'video/mp4') throw new Error('Invalid video type');
       const url = URL.createObjectURL(blob);
       const video = document.getElementById('video');
-      video.src = ""; // 기존 src 비우기
+      video.removeAttribute('src'); // 기존 src 제거
+      video.load();
       video.src = url;
+      video.load();
     })
     .catch(err => {
       alert('샘플 영상을 불러올 수 없습니다.');
+      console.error(err);
     });
 }
 
