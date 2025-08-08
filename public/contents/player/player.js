@@ -2,33 +2,6 @@ const $ = function(sel){return document.querySelector(sel)};
 const $$ = function(sel){return document.querySelectorAll(sel)};
 const $frag = (function(){let range = document.createRange();return function(v){return range.createContextualFragment(v)}})();
 
-// function loadSampleVideo() {
-//   const video = $frag(`<video></video>`);
-//   $('#videoContainer').before(video);
-//   fetch('/video/sample.mp4')
-//     .then(res => {
-//       if (!res.ok) throw new Error('Sample video not found');
-//       return res.blob();
-//     })
-//     .then(blob => {
-//       if (!blob.type.startsWith('video/')) throw new Error('Invalid video type: ' + blob.type);
-//       const url = URL.createObjectURL(blob);
-//       console.log($('video'));
-//       video.src = url;
-//       video.load();
-//     })
-//     .catch(err => {
-//       alert('샘플 영상을 불러올 수 없습니다.');
-//       console.error(err);
-//     });
-// }
-
-onload = () => {
-
-// loadSampleVideo();
-const video = $frag(`<video src="/video/sample.mp4"></video>`);
-$('#videoContainer').prepend(video);
-
 const media = $('video');
 const $playBtn = $('#play');
 const $playIcon = $playBtn.querySelector('i');
@@ -341,4 +314,3 @@ const $introClose = $('#introClose');
 $introClose.onclick = () => {
   $intro.style.display = 'none';
 };
-}
