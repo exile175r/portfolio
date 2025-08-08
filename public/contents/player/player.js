@@ -27,11 +27,20 @@ const updatePlayPauseIcon = (isPlaying) => {
   }
 }
 
-media.src = '/video/sample.mp4';
-media.load();
-media.onloadedmetadata = () => {
-  media.currentTime = 0;
-};
+function loadSampleVideo() {
+  fetch('/video/sample.mp4')
+    .then(res => res.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const video = document.getElementById('video');
+      video.src = url;
+    });
+}
+
+// 페이지 최초 로드 시 실행
+addEventListener('DOMContentLoaded', () => {
+  loadSampleVideo();
+});
 
 function Player() {
   const $this = this;
