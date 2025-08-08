@@ -5,7 +5,6 @@ const $frag = (function(){let range = document.createRange();return function(v){
 onload = () => {
 
 const media = $('video');
-console.log('media: ', media);
 const $playBtn = $('#play');
 const $playIcon = $playBtn.querySelector('i');
 const $progressBar = $("#timeline");
@@ -28,14 +27,16 @@ const updatePlayPauseIcon = (isPlaying) => {
   }
 }
 
+media.src = '/video/sample.mp4';
+media.load();
+media.onloadedmetadata = () => {
+  media.currentTime = 0;
+};
+
 function Player() {
   const $this = this;
   let playTimer;
   $this.currentTime = 0;
-  media.load();
-  media.onloadedmetadata = () => {
-    timeupdate();
-  };
   $this.play = function () {
     updatePlayPauseIcon(true);
     media.play();
