@@ -13,100 +13,128 @@
   <title>canvas</title>
 </head>
 <body>
-  <div id="wrap">
-    <div id="canvasBox">
-      <canvas id="canvas"></canvas>
-      <canvas id="highlightCanvas" class="hide"></canvas>
+  <div id="canvasBox">
+    <canvas id="canvas"></canvas>
+    <canvas id="highlightCanvas" class="hide"></canvas>
+  </div>
+  <svg id="figure" class="eNone"></svg>
+  <div id="textBox"></div>
+  <div id="drawTool">
+    <h2>판서 & 그리기</h2>
+    <div class="tab">
+      <button class="on"><img src="img/draw_ico.svg"></button>
+      <button><img src="img/text_ico.svg"></button>
     </div>
-    <svg id="figure" class="eNone"></svg>
-    <div id="textBox"></div>
-    <div id="drawTool">
-      <h2>판서 & 그리기</h2>
-      <div class="tab">
-        <button class="on"><img src="img/draw_ico.svg"></button>
-        <button><img src="img/text_ico.svg"></button>
+    <div class="drawBack">
+      <p>판서 배경 선택</p>
+      <ul>
+        <li class="on">현재 화면</li>
+        <li>칠판</li>
+      </ul>
+    </div>
+    <section>
+      <div class="drawToolSelect">
+        <span><button class="on" data-tool="pen"><img src="img/draw_button_1_off.svg"></button><em>펜</em></span>
+        <span><button data-tool="highlighter"><img src="img/draw_button_2_off.svg"></button><em>형광펜</em></span>
+        <span><button data-tool="clear"><img src="img/draw_button_3_off.svg"></button><em>부분<br>지우개</em></span>
+        <span><button data-tool="allClear"><img src="img/draw_button_4_off.svg"></button><em>전체<br>지우개</em></span>
+        <span><button data-tool="line"><img src="img/draw_button_5_off.svg"></button><em>직선</em></span>
+        <span><button data-tool="arrow"><img src="img/draw_button_6_off.svg"></button><em>화살표</em></span>
+        <span><button data-tool="rect"><img src="img/draw_button_7_off.svg"></button><em>사각형</em></span>
+        <span><button data-tool="ellipse"><img src="img/draw_button_8_off.svg"></button><em>원</em></span>
       </div>
-      <div class="drawBack">
-        <p>판서 배경 선택</p>
+      <div class="drawThickness">
+        <p>선 굵기</p>
         <ul>
-          <li class="on">현재 화면</li>
-          <li>칠판</li>
+          <li class="on" data-thickness="10"></li>
+          <li data-thickness="16"></li>
+          <li data-thickness="20"></li>
+          <li data-thickness="30"></li>
         </ul>
       </div>
-      <section>
-        <div class="drawToolSelect">
-          <span><button class="on" data-tool="pen"><img src="img/draw_button_1_off.svg"></button><em>펜</em></span>
-          <span><button data-tool="highlighter"><img src="img/draw_button_2_off.svg"></button><em>형광펜</em></span>
-          <span><button data-tool="clear"><img src="img/draw_button_3_off.svg"></button><em>부분<br>지우개</em></span>
-          <span><button data-tool="allClear"><img src="img/draw_button_4_off.svg"></button><em>전체<br>지우개</em></span>
-          <span><button data-tool="line"><img src="img/draw_button_5_off.svg"></button><em>직선</em></span>
-          <span><button data-tool="arrow"><img src="img/draw_button_6_off.svg"></button><em>화살표</em></span>
-          <span><button data-tool="rect"><img src="img/draw_button_7_off.svg"></button><em>사각형</em></span>
-          <span><button data-tool="ellipse"><img src="img/draw_button_8_off.svg"></button><em>원</em></span>
-        </div>
-        <div class="drawThickness">
-          <p>선 굵기</p>
-          <ul>
-            <li class="on" data-thickness="10"></li>
-            <li data-thickness="16"></li>
-            <li data-thickness="20"></li>
-            <li data-thickness="30"></li>
-          </ul>
-        </div>
-      </section>
-      <section class="hide">
-        <div class="textAdd">
-          <p>글 상자 추가</p>
-          <button>+</button>
-          <p>현재 글자 모양은 ‘<span>나눔스퀘어</span>’입니다</p>
-        </div>
-        <div class="textSetting">
-          <p>글자 모양 변경</p>
-          <select name="font" id="font">
-            <option value="나눔스퀘어">나눔스퀘어</option>
-            <option value="나눔스퀘어">나눔스퀘어</option>
-            <option value="나눔스퀘어">나눔스퀘어</option>
-            <option value="나눔스퀘어">나눔스퀘어</option>
-            <option value="나눔스퀘어">나눔스퀘어</option>
-          </select>
-          <div>
-            <button data-text="down">-</button>
-            <span>12</span>
-            <button data-text="up">+</button>
-            <input type="radio" name="textStyle" id="textStyle1">
-            <input type="radio" name="textStyle" id="textStyle2">
-            <input type="radio" name="textStyle" id="textStyle3">
-            <label for="textStyle1" data-text="bold">A</label>
-            <label for="textStyle2" data-text="italic">A</label>
-            <label for="textStyle3" data-text="underline">A</label>
-          </div>
-        </div>
-      </section>
-      <div class="drawColor">
-        <p>색상 선택</p>
-        <ul>
-          <li data-color="#ff1d1d"></li>
-          <li data-color="#ffff54"></li>
-          <li data-color="#4fad5b"></li>
-          <li data-color="#216cc6"></li>
-          <li data-color="#000"></li>
-          <li class="addColor" data-color=""><img src="img/add_ico.svg"></li>
-          <li class="addColor" data-color=""><img src="img/add_ico.svg"></li>
-          <li class="addColor" data-color=""><img src="img/add_ico.svg"></li>
-          <li class="addColor" data-color=""><img src="img/add_ico.svg"></li>
-        </ul>
+    </section>
+    <section class="hide">
+      <div class="textAdd">
+        <p>글 상자 추가</p>
+        <button>+</button>
+        <p>현재 글자 모양은 ‘<span>나눔스퀘어</span>’입니다</p>
       </div>
-      <div class="colorPicker">
-        <div class="cp_color_plate"></div>
-        <input type="range" min="0" max="359" value="0" id="hue" />
+      <div class="textSetting eNone">
+        <p>글자 모양 변경</p>
+        <!--
+        - Segoe UI: 윈도우 인터페이스 전용 폰트로, 대부분 언어에서 사용됨
+        - Arial / Times New Roman / Calibri / Verdana / Tahoma: 국제적으로 널리 쓰이며 호환성을 위해 거의 모든 Windows 시스템에 포함
+        - Consolas / Courier New: 프로그래밍이나 콘솔용으로 글로벌 공통
+        -->
+        <select name="font" id="font">
+          <option value="Segoe UI" selected>Segoe UI</option>
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Calibri">Calibri</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Tahoma">Tahoma</option>
+          <option value="Consolas">Consolas</option>
+          <option value="Courier New">Courier New</option>
+        </select>
+        <div>
+          <button data-text="down">-</button>
+          <span>12</span>
+          <button data-text="up">+</button>
+          <input type="checkbox" name="textStyle" id="textStyle1">
+          <input type="checkbox" name="textStyle" id="textStyle2">
+          <input type="checkbox" name="textStyle" id="textStyle3">
+          <label for="textStyle1" data-text="bold">A</label>
+          <label for="textStyle2" data-text="italic">A</label>
+          <label for="textStyle3" data-text="underline">A</label>
+        </div>
       </div>
-      <!-- <button class="close"><img src="img/close_popup_ico.svg"></button> -->
+    </section>
+    <div class="drawColor">
+      <p>색상 선택<span class="colorBox"></span></p>
+      <ul>
+        <!-- 
+        <li data-color="transparent"></li>
+        <li data-color="#ff1d1d"></li>
+        <li data-color="#ffff54"></li>
+        <li data-color="#4fad5b"></li>
+        <li data-color="#216cc6"></li>
+         -->
+        <li class="on" data-color="#000"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+        <li data-color=""><img src="img/add_ico.svg"></li>
+      </ul>
+      <div class="hidden">
+        <input type="radio" name="color" id="border_color" checked>
+        <label for="border_color">
+          <span>border</span>
+        </label>
+        /
+        <input type="radio" name="color" id="fill_color">
+        <label for="fill_color">
+          <span>fill</span>
+        </label>
+      </div>
     </div>
-    <div class="transparency hidden">
-      <span>진하게</span>
-      <input type="range" id="gauge" min="0" value="0" max="9.5" step="0.1">
-      <span>투명하게</span>
+    <div class="colorPicker">
+      <div class="cp_color_plate"></div>
+      <input type="range" min="0" max="359" value="0" id="hue" />
     </div>
+    <!-- <button class="close"><img src="img/close_popup_ico.svg"></button> -->
+  </div>
+  <div class="transparency hidden">
+    <span>진하게</span>
+    <input type="range" id="gauge" min="0" value="0" max="9.5" step="0.1">
+    <span>투명하게</span>
+  </div>
+  
+  <div class="figureAlert">
+    <p>선택된 도형은 "Delete" key로 지울 수 있습니다.</p>
   </div>
   <script src="index.js"></script>
 </body>

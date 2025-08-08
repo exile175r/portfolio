@@ -15,25 +15,19 @@ input {background-color: transparent;border: none;outline: none;line-height:1;}
 .hidden {opacity: 0;pointer-events: none;}
 .eNone {pointer-events: none;}
 
-body {
-  margin:0;
-  height: 100vh;
-  background-color: #000;
-  overflow: hidden;
-  touch-action: none;
+:root {
+  --tx: 0;
+  --ty: 0;
 }
 
-#wrap {
-  width: 1280px;
-  height: 800px;
-  transform-origin: 0 0;
-  position: relative;
+body {
+  overflow: hidden;
+  touch-action: none;
 }
 
 #canvasBox {
   width: 100%;
   height: 100%;
-  background-color: #fff;
   position: absolute;
   left: 0;
   top: 0;
@@ -46,6 +40,8 @@ canvas {
 #highlightCanvas {opacity: .5;}
 
 #figure {width: 100%;height: 100%;position: absolute;left: 0;top: 0;}
+#figure * {cursor: default}
+#figure g {pointer-events: auto}
 #figure line {
   stroke-linecap: round;
 }
@@ -55,19 +51,17 @@ canvas {
 }
 #figure .arrow rect:last-child {
   transform-origin: var(--ox) var(--oy);
-  transform: rotate(var(--r));
+  transform: rotate(var(--r)) translate(calc(var(--tx)*1px), calc(var(--ty)*1px));
 }
 #figure .rect rect {
   transform: scaleX(var(--rsx)) scaleY(var(--rsy));
-  transform-origin: center;
 }
 #figure ellipse {
   transform: scaleX(var(--esx)) scaleY(var(--esy));
 }
 
 #figure :not(.on) .re,
-#figure :not(.on) .reBox,
-#figure :not(.on) .rotate {
+#figure :not(.on) .reBox {
   opacity: 0;
   pointer-events: none;
 }
@@ -87,6 +81,10 @@ canvas {
 
 #figure .ellipse .reBox {
   transform: scaleX(var(--esx)) scaleY(var(--esy));
+}
+#figure .ellipse image {
+  transform: translate(-10px, -10px);
+  cursor: pointer;
 }
 
 #drawTool {
@@ -235,6 +233,12 @@ canvas {
   opacity: 1;
 }
 
+#drawTool .drawThickness {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+#drawTool .drawThickness > p {margin-bottom: 0;}
 #drawTool .drawThickness li {
   display: flex;
   justify-content: center;
@@ -281,40 +285,68 @@ canvas {
 }
 
 #drawTool .drawColor {
-    padding-bottom: 10px;
+  padding-bottom: 10px;
+}
+#drawTool .drawColor p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#drawTool .drawColor .colorBox {
+  width: 36px;
+  height: 15px;
+  background-color: #000;
+  border-radius: 3px;
+  box-shadow: 0 0 1.5px 1px rgba(255,255,255,0.4);
 }
 #drawTool .drawColor ul {justify-content: space-between;}
 #drawTool .drawColor li {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 24px;
-    height: 24px;
-    border: solid 1px #b5b5b5;
-    border-radius: 50%;
-    position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 24px;
+  height: 24px;
+  border: solid 1px #b5b5b5;
+  border-radius: 50%;
+  position: relative;
 }
 #drawTool .drawColor li:nth-child(1) {
-    background-color: #ff1d1d;
+  background-color: #000;
+}
+/**
+#drawTool .drawColor li:nth-child(1) {
+  background-color: #fff;
+}
+#drawTool .drawColor li:nth-child(1):after {
+  content: '';
+  width: 100%;
+  height: 2px;
+  background-color: #ff1d1d;
+  transform: rotate(-45deg);
 }
 #drawTool .drawColor li:nth-child(2) {
-    background-color: #ffff54;
+  background-color: #ff1d1d;
 }
 #drawTool .drawColor li:nth-child(3) {
-    background-color: #4fad5b;
+  background-color: #ffff54;
 }
 #drawTool .drawColor li:nth-child(4) {
-    background-color: #216cc6;
+  background-color: #4fad5b;
 }
 #drawTool .drawColor li:nth-child(5) {
-    background-color: #000;
+  background-color: #216cc6;
 }
-#drawTool .drawColor li:nth-child(6),
+#drawTool .drawColor li:nth-child(6) {
+  background-color: #000;
+}
 #drawTool .drawColor li:nth-child(7),
 #drawTool .drawColor li:nth-child(8),
-#drawTool .drawColor li:nth-child(9) {
-    background-color: #b5b5b5;
+#drawTool .drawColor li:nth-child(9),
+#drawTool .drawColor li:nth-child(10) {
+  background-color: #b5b5b5;
 }
+
+**/
 #drawTool .drawColor li.on:before {
   content: '';
   margin: auto;
@@ -322,6 +354,49 @@ canvas {
   border-radius: 50%;
   position: absolute;
   inset: -3px;
+}
+#drawTool .drawColor li {
+  background-color: #b5b5b5;
+}
+/* #drawTool .drawColor li[data-color='']{
+  pointer-events: none;
+} */
+
+#drawTool .drawColor > div {
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  inset: 18px 22px auto auto;
+}
+#drawTool .drawColor > div input {
+  display: none;
+}
+#drawTool .drawColor > div label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 14px;
+  cursor: default;
+}
+#drawTool .drawColor > div label span {
+  padding: 0 3px;
+  background-color: rgba(255,255,255,.08);
+  border-radius: 3px;
+  color: rgba(255,255,255,.5);
+  cursor: pointer;
+}
+#drawTool .drawColor > div label div {
+  width: 30px;
+  height: 80%;
+  border: 1px solid #fff;
+  border-radius: 2px;
+}
+#drawTool .drawColor > div label[for="border_color"] div {
+  background-color: #000;
+}
+#drawTool .drawColor > div input:checked + label span {
+  background-color: #3979e1;
+  color: #fff;
 }
 
 #drawTool .colorPicker {
@@ -504,11 +579,11 @@ canvas {
 }
 
 #drawTool .textSetting div [data-text="bold"] {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 #drawTool .textSetting div [data-text="italic"] {
-    font-style: italic;
+  font-style: italic;
 }
 
 #drawTool .textSetting div [data-text="underline"] {
@@ -522,6 +597,11 @@ canvas {
   line-height: 38px;
 }
 
+#drawTool .textSetting.eNone select,
+#drawTool .textSetting.eNone div{
+  opacity: .4
+}
+
 #textBox {
   position: absolute;
   left: 0;
@@ -531,8 +611,28 @@ canvas {
 #textBox .text > *:not(textarea) {
   position: absolute;
 }
-#textBox .text {padding: 20px 20px 10px;width: 360px;height: 70px;border: 1.5px solid #e3e3e3;}
-#textBox .text textarea {padding-right: 3px;width: 100%;height: 100%;font-size: 12px;color: #fff;line-height: 12px;}
+#textBox .text {
+  /* padding: 20px 0; */
+  padding: 20px;
+  /* width: 360px; */
+  /* height: 70px; */
+  border: 1.5px solid #e3e3e3;
+  box-shadow: inset 0 0 0 20px #f8f8f87a;
+  left: 50px;
+  top: 50px;
+  cursor: move;
+}
+
+#textBox .text textarea {
+  /* padding: 0 20px; */
+  /* padding-right: 3px; */
+  width: 200px;
+  height: 200px;
+  font-size: 12px;
+  line-height: 12px;
+  word-break: break-all;
+  resize: both;
+}
 #textBox .text button {
   right: -15px;
   top: -15px;
@@ -547,12 +647,19 @@ canvas {
   bottom: -15px;
 }
 #textBox .text .rotate {margin: auto;inset: -15px 0 auto;cursor: all-scroll;}
-/* #textBox .text:not(.on) {
+#textBox .text:not(.on) {
+  pointer-events: none;
   border-color: transparent;
-} */
+  box-shadow: none;
+}
+#textBox:not(.eNone) .text:not(.on) textarea {pointer-events: auto;}
+#textBox .text:not(.on) textarea {resize: none;}
 #textBox .text:not(.on) button,
 #textBox .text:not(.on) .resize,
 #textBox .text:not(.on) .rotate {
   pointer-events: none;
   opacity: 0;
 }
+
+#figure.eNone ~ .figureAlert {display: none;}
+.figureAlert {padding-right: 10px;pointer-events: none;text-align: right;color: #555;}

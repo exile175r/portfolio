@@ -2,19 +2,6 @@ const $ = function(sel){return document.querySelector(sel)};
 const $$ = function(sel){return document.querySelectorAll(sel)};
 const $frag = (function(){let range = document.createRange();return function(v){return range.createContextualFragment(v)}})();
 
-let scale, scaleL;
-const resize = () => {
-  const $wrap = $('#wrap');
-  const {offsetWidth, offsetHeight} = document.body;
-	const {clientWidth, clientHeight} = $wrap;
-  scale = clientWidth * Math.min(offsetWidth / clientWidth, offsetHeight / clientHeight) / clientWidth;
-	scaleL = (offsetWidth / scale - clientWidth) / 2;
-  $wrap.style.transform = `scale(${scale}) translate(${scaleL}px, 0px)`;
-}
-
-onload = resize;
-onresize = resize;
-
 const number = [1,2,3,4,5,6,7,8,9,10,11,12,13];
 const shape = ['♠', '♣', '◆', '♥'];
 const list = Array(13*4).fill().map((_, i) => {
@@ -84,12 +71,13 @@ $cards.onclick = ({target}) => {
   target.classList.add('hidden');
 }
 
+const $main = $('main');
 let prevX, prevY, $this, parent, isList, styles = [], dragList = [];
-$('main').onpointerdown = ({x, y, target}) => {
+$main.onpointerdown = ({x, y, target}) => {
   if(!target.closest('[data-drag]') || target.closest('.turn') || target.parentNode.id == 'drop') return;
   $this = target;
-  prevX = x / scale;
-  prevY = y / scale;
+  prevX = x;
+  prevY = y;
   isList = $this.closest('#list');
   parent = $this.parentNode;
   if(isList){
@@ -107,13 +95,13 @@ const move = ({x, y}) => {
   if(isList){
     dragList.forEach($ => {
       Object.assign($.style, {
-        transform: `translate(${x / scale - prevX}px, ${y / scale - prevY}px)`,
+        transform: `translate(${x - prevX}px, ${y - prevY}px)`,
         zIndex: 10
       });
     });
   }else{
     Object.assign($this.style, {
-      transform: `translate(${x / scale - prevX}px, ${y / scale - prevY}px)`,
+      transform: `translate(${x - prevX}px, ${y - prevY}px)`,
       zIndex: 10
     });
   }
@@ -194,6 +182,63 @@ const end = ({x, y}) => {
   styles.length = 0;
   onpointermove = null;
   onpointerup = null;
+
+  // Clear!!!!
+  if([...$$('#drop > div')].map(v => +v.dataset.drag).every(v => v == 15)){
+    alert('Clear!!!!');
+  }
 }
 
+const $$dropBox = $$('#drop > div');
+$main.ondblclick = ({target}) => {
+  if(!target.closest('[data-drag]') || target.closest('.turn')) return;
+  const dropList = [...$$dropBox].map(v => v.dataset.type);
+  let isDrop = dropList.some(v => v);
+  const {drag, type} = target.dataset;
+  const parent = target.parentNode;
+  let idx;
+  if(isDrop){
+    let isDropAll = dropList.every(v => v);
+    let typeIdx = dropList.indexOf(type);
+    if(isDropAll){
+      // 상단 드랍 영역이 모두 object가 있는 경우
+      const {drag: boxDrag} = $$dropBox[typeIdx].dataset;
+      if(+boxDrag - 1 == +drag) idx = typeIdx;
+      else return;
+    }else{
+      // 상단 드랍 영역이 하나 이상 비어있는 경우
+      if(typeIdx < 0){
+        if(+drag != 1) return;
+        idx = dropList.map((v, i) => {if(!v) return i}).filter(v => v != undefined)[0];
+      }else{
+        const {drag: boxDrag} = $$dropBox[typeIdx].dataset;
+        if(+boxDrag - 1 == +drag) idx = typeIdx;
+        else return;
+      }
+    }
+  }else{
+    // 상단 드랍 영역이 모두 비어있는 경우
+    if(+drag == 1) idx = 0;
+    else return;
+  }
+  let isList = parent.closest('#list');
+  let targetCard = isList ? target : target.cloneNode(true);
+  $$dropBox[idx].dataset.type = type;
+  $$dropBox[idx].dataset.drag = +$$dropBox[idx].dataset.drag + 1;
+  $$dropBox[idx].append(targetCard);
+  
+  if(isList && parent.children.length)
+    parent.querySelector('[data-drag]:last-child').className = '';
+
+  if(parent.closest('#drag')) {
+    target.remove();
+    let i = $cards.childElementCount - $drag.childElementCount - 1;
+    $cards.querySelectorAll('[data-drag]')[i].remove();
+  }
+
+  // Clear!!!!
+  if([...$$('#drop > div')].map(v => +v.dataset.drag).every(v => v == 15)){
+    alert('Clear!!!!');
+  }
+}
 
