@@ -4,9 +4,10 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
     let rad = Math.atan2(y2 - y1, x2 - x1);
     return (rad*180)/Math.PI ;
   }
-  const sign = (v) => Math.sign(v);
-  const calcAngleDegrees = (x, y) => Math.atan2(y, x) * 180 / Math.PI;
+  // const calcAngleDegrees = (x, y) => Math.atan2(y, x) * 180 / Math.PI;
   const targetInfo = [];
+  console.log('figureInfo: ', figureInfo);
+  console.log('idx: ', idx);
   const fig = figureInfo[idx];
   const minSize = 20;
   let $t, prevX, prevY, parentInfo, parentStyle;

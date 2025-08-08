@@ -1,19 +1,85 @@
 @charset "utf-8";
 
-* {margin: 0;padding: 0;box-sizing: border-box;user-select: none;}
-h1, h2, h3, h4, h5, h6 {font-size:1em;font-weight:normal;}
-ul, ol, li {list-style-type:none;}
-img {vertical-align:middle;pointer-events:none;}
-label, input, select, textarea, button {vertical-align:middle;}
-label, button {cursor:pointer;}
-strong, em {font-weight:normal;font-style: normal;}
-button {background-color: transparent;outline: none;border: none;}
-textarea {background-color: transparent;border: none;outline: none;resize: none;line-height:1;}
-input {background-color: transparent;border: none;outline: none;line-height:1;}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+}
 
-.hide {display: none;}
-.hidden {opacity: 0;pointer-events: none;}
-.eNone {pointer-events: none;}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: 1em;
+  font-weight: normal;
+}
+
+ul,
+ol,
+li {
+  list-style-type: none;
+}
+
+img {
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+label,
+input,
+select,
+textarea,
+button {
+  vertical-align: middle;
+}
+
+label,
+button {
+  cursor: pointer;
+}
+
+strong,
+em {
+  font-weight: normal;
+  font-style: normal;
+}
+
+button {
+  background-color: transparent;
+  outline: none;
+  border: none;
+}
+
+textarea {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  line-height: 1;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  line-height: 1;
+}
+
+.hide {
+  display: none;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.eNone {
+  pointer-events: none;
+}
 
 :root {
   --tx: 0;
@@ -23,6 +89,7 @@ input {background-color: transparent;border: none;outline: none;line-height:1;}
 body {
   overflow: hidden;
   touch-action: none;
+  background-color: #fff;
 }
 
 #canvasBox {
@@ -37,25 +104,45 @@ canvas {
   position: absolute;
   top: 0;
 }
-#highlightCanvas {opacity: .5;}
 
-#figure {width: 100%;height: 100%;position: absolute;left: 0;top: 0;}
-#figure * {cursor: default}
-#figure g {pointer-events: auto}
+#highlightCanvas {
+  opacity: .5;
+}
+
+#figure {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+#figure * {
+  cursor: default
+}
+
+#figure g {
+  pointer-events: auto
+}
+
 #figure line {
   stroke-linecap: round;
 }
+
 #figure polygon {
   transform-origin: var(--ox) var(--oy);
   transform: translate(calc(var(--x)*1px), calc(var(--y)*1px)) rotate(var(--r));
 }
+
 #figure .arrow rect:last-child {
   transform-origin: var(--ox) var(--oy);
   transform: rotate(var(--r)) translate(calc(var(--tx)*1px), calc(var(--ty)*1px));
 }
+
 #figure .rect rect {
   transform: scaleX(var(--rsx)) scaleY(var(--rsy));
 }
+
 #figure ellipse {
   transform: scaleX(var(--esx)) scaleY(var(--esy));
 }
@@ -67,21 +154,28 @@ canvas {
 }
 
 #figure .line .re:hover,
-#figure .arrow .re:hover {cursor: ew-resize;}
+#figure .arrow .re:hover {
+  cursor: ew-resize;
+}
 
 #figure .rect .re:nth-child(2):hover,
 #figure .rect .re:nth-child(5):hover,
 #figure .ellipse .re:nth-of-type(2):hover,
-#figure .ellipse .re:nth-of-type(5):hover {cursor: nw-resize;}
+#figure .ellipse .re:nth-of-type(5):hover {
+  cursor: nw-resize;
+}
 
 #figure .rect .re:nth-child(3):hover,
 #figure .rect .re:nth-child(4):hover,
 #figure .ellipse .re:nth-of-type(3):hover,
-#figure .ellipse .re:nth-of-type(4):hover {cursor: sw-resize;}
+#figure .ellipse .re:nth-of-type(4):hover {
+  cursor: sw-resize;
+}
 
 #figure .ellipse .reBox {
   transform: scaleX(var(--esx)) scaleY(var(--esy));
 }
+
 #figure .ellipse image {
   transform: translate(-10px, -10px);
   cursor: pointer;
@@ -146,7 +240,7 @@ canvas {
   content: '';
   position: absolute;
   inset: auto 20px 0;
-  border-bottom: 1px solid rgba(255,255,255,.15);
+  border-bottom: 1px solid rgba(255, 255, 255, .15);
 }
 
 #drawTool .drawBack ul {
@@ -189,7 +283,7 @@ canvas {
   margin-bottom: 5px;
   width: 42px;
   height: 40px;
-  background-color: rgba(255,255,255,.05);
+  background-color: rgba(255, 255, 255, .05);
   border-radius: 5px;
   position: relative;
 }
@@ -203,27 +297,35 @@ canvas {
   pointer-events: none;
   opacity: 0;
 }
+
 #drawTool .drawToolSelect span:nth-child(1) button:before {
   background-image: url(img/draw_button_1_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(2) button:before {
   background-image: url(img/draw_button_2_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(3) button:before {
   background-image: url(img/draw_button_3_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(4) button:before {
   background-image: url(img/draw_button_4_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(5) button:before {
   background-image: url(img/draw_button_5_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(6) button:before {
   background-image: url(img/draw_button_6_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(7) button:before {
   background-image: url(img/draw_button_7_on.svg);
 }
+
 #drawTool .drawToolSelect span:nth-child(8) button:before {
   background-image: url(img/draw_button_8_on.svg);
 }
@@ -234,11 +336,15 @@ canvas {
 }
 
 #drawTool .drawThickness {
-    display: flex;
-    align-items: center;
-    gap: 40px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
 }
-#drawTool .drawThickness > p {margin-bottom: 0;}
+
+#drawTool .drawThickness>p {
+  margin-bottom: 0;
+}
+
 #drawTool .drawThickness li {
   display: flex;
   justify-content: center;
@@ -246,7 +352,7 @@ canvas {
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background-color: rgba(255,255,255,.1);
+  background-color: rgba(255, 255, 255, .1);
   position: relative;
 }
 
@@ -287,19 +393,25 @@ canvas {
 #drawTool .drawColor {
   padding-bottom: 10px;
 }
+
 #drawTool .drawColor p {
   display: flex;
   align-items: center;
   gap: 10px;
 }
+
 #drawTool .drawColor .colorBox {
   width: 36px;
   height: 15px;
   background-color: #000;
   border-radius: 3px;
-  box-shadow: 0 0 1.5px 1px rgba(255,255,255,0.4);
+  box-shadow: 0 0 1.5px 1px rgba(255, 255, 255, 0.4);
 }
-#drawTool .drawColor ul {justify-content: space-between;}
+
+#drawTool .drawColor ul {
+  justify-content: space-between;
+}
+
 #drawTool .drawColor li {
   display: flex;
   justify-content: center;
@@ -310,9 +422,11 @@ canvas {
   border-radius: 50%;
   position: relative;
 }
+
 #drawTool .drawColor li:nth-child(1) {
   background-color: #000;
 }
+
 /**
 #drawTool .drawColor li:nth-child(1) {
   background-color: #fff;
@@ -355,46 +469,54 @@ canvas {
   position: absolute;
   inset: -3px;
 }
+
 #drawTool .drawColor li {
   background-color: #b5b5b5;
 }
+
 /* #drawTool .drawColor li[data-color='']{
   pointer-events: none;
 } */
 
-#drawTool .drawColor > div {
+#drawTool .drawColor>div {
   display: flex;
   gap: 5px;
   position: absolute;
   inset: 18px 22px auto auto;
 }
-#drawTool .drawColor > div input {
+
+#drawTool .drawColor>div input {
   display: none;
 }
-#drawTool .drawColor > div label {
+
+#drawTool .drawColor>div label {
   display: flex;
   align-items: center;
   gap: 2px;
   font-size: 14px;
   cursor: default;
 }
-#drawTool .drawColor > div label span {
+
+#drawTool .drawColor>div label span {
   padding: 0 3px;
-  background-color: rgba(255,255,255,.08);
+  background-color: rgba(255, 255, 255, .08);
   border-radius: 3px;
-  color: rgba(255,255,255,.5);
+  color: rgba(255, 255, 255, .5);
   cursor: pointer;
 }
-#drawTool .drawColor > div label div {
+
+#drawTool .drawColor>div label div {
   width: 30px;
   height: 80%;
   border: 1px solid #fff;
   border-radius: 2px;
 }
-#drawTool .drawColor > div label[for="border_color"] div {
+
+#drawTool .drawColor>div label[for="border_color"] div {
   background-color: #000;
 }
-#drawTool .drawColor > div input:checked + label span {
+
+#drawTool .drawColor>div input:checked+label span {
   background-color: #3979e1;
   color: #fff;
 }
@@ -442,7 +564,7 @@ canvas {
 
 #drawTool input[type="range"]#hue::-webkit-slider-runnable-track {
   height: 14px;
-  background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%));
+  background: linear-gradient(to right, hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%));
   box-shadow: inset 0 0 5px #fff, inset 0 0 1px #fff;
   border-radius: 20px;
 }
@@ -468,7 +590,19 @@ canvas {
   top: 10px;
 }
 
-.transparency {margin: 0 auto;padding: 0 15px;display: flex;align-items: center;width: 639px;height: 60px;background-color: rgba(17, 20, 31, .8);border-radius: 60px;color: #fff;position: fixed;inset: auto 0 25px;}
+.transparency {
+  margin: 0 auto;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  width: 639px;
+  height: 60px;
+  background-color: rgba(17, 20, 31, .8);
+  border-radius: 60px;
+  color: #fff;
+  position: fixed;
+  inset: auto 0 25px;
+}
 
 .transparency input[type="range"]#gauge {
   margin: 0 10px;
@@ -511,7 +645,7 @@ canvas {
 }
 
 #drawTool .textAdd button:hover {
-  background-color: rgba(255,255,255,.4);
+  background-color: rgba(255, 255, 255, .4);
 }
 
 #drawTool .textAdd p:last-child {
@@ -537,7 +671,7 @@ canvas {
   color: #fff;
 }
 
-#drawTool .textSetting div > * {
+#drawTool .textSetting div>* {
   height: 38px;
   border-radius: 5px;
 }
@@ -548,7 +682,7 @@ canvas {
 
 #drawTool .textSetting div button,
 #drawTool .textSetting div label {
-  background-color: rgba(255,255,255,.1);
+  background-color: rgba(255, 255, 255, .1);
   color: #fff;
 }
 
@@ -557,19 +691,23 @@ canvas {
   justify-content: center;
   align-items: center;
 }
-#drawTool .textSetting div #textStyle1:checked ~ [data-text="bold"],
-#drawTool .textSetting div #textStyle2:checked ~ [data-text="italic"],
-#drawTool .textSetting div #textStyle3:checked ~ [data-text="underline"],
+
+#drawTool .textSetting div #textStyle1:checked~[data-text="bold"],
+#drawTool .textSetting div #textStyle2:checked~[data-text="italic"],
+#drawTool .textSetting div #textStyle3:checked~[data-text="underline"],
 #drawTool .textSetting div button:active {
   background-color: #397be3;
 }
 
-#drawTool .textSetting div [data-text="down"], #drawTool .textSetting div [data-text="up"] {
+#drawTool .textSetting div [data-text="down"],
+#drawTool .textSetting div [data-text="up"] {
   width: 28px;
   font-size: 26px;
 }
 
-#drawTool .textSetting div [data-text="bold"], #drawTool .textSetting div [data-text="italic"], #drawTool .textSetting div [data-text="underline"] {
+#drawTool .textSetting div [data-text="bold"],
+#drawTool .textSetting div [data-text="italic"],
+#drawTool .textSetting div [data-text="underline"] {
   width: 38px;
   font-size: 18px;
 }
@@ -598,7 +736,7 @@ canvas {
 }
 
 #drawTool .textSetting.eNone select,
-#drawTool .textSetting.eNone div{
+#drawTool .textSetting.eNone div {
   opacity: .4
 }
 
@@ -607,10 +745,12 @@ canvas {
   left: 0;
   top: 0;
 }
+
 #textBox .text,
-#textBox .text > *:not(textarea) {
+#textBox .text>*:not(textarea) {
   position: absolute;
 }
+
 #textBox .text {
   /* padding: 20px 0; */
   padding: 20px;
@@ -633,27 +773,43 @@ canvas {
   word-break: break-all;
   resize: both;
 }
+
 #textBox .text button {
   right: -15px;
   top: -15px;
 }
+
 #textBox .text .resize,
 #textBox .text .rotate {
   width: fit-content;
   height: fit-content;
 }
+
 #textBox .text .resize {
   right: -15px;
   bottom: -15px;
 }
-#textBox .text .rotate {margin: auto;inset: -15px 0 auto;cursor: all-scroll;}
+
+#textBox .text .rotate {
+  margin: auto;
+  inset: -15px 0 auto;
+  cursor: all-scroll;
+}
+
 #textBox .text:not(.on) {
   pointer-events: none;
   border-color: transparent;
   box-shadow: none;
 }
-#textBox:not(.eNone) .text:not(.on) textarea {pointer-events: auto;}
-#textBox .text:not(.on) textarea {resize: none;}
+
+#textBox:not(.eNone) .text:not(.on) textarea {
+  pointer-events: auto;
+}
+
+#textBox .text:not(.on) textarea {
+  resize: none;
+}
+
 #textBox .text:not(.on) button,
 #textBox .text:not(.on) .resize,
 #textBox .text:not(.on) .rotate {
@@ -661,5 +817,13 @@ canvas {
   opacity: 0;
 }
 
-#figure.eNone ~ .figureAlert {display: none;}
-.figureAlert {padding-right: 10px;pointer-events: none;text-align: right;color: #555;}
+#figure.eNone~.figureAlert {
+  display: none;
+}
+
+.figureAlert {
+  padding-right: 10px;
+  pointer-events: none;
+  text-align: right;
+  color: #555;
+}

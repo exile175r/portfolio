@@ -1,7 +1,7 @@
 const newSVGTag = (elementType, attributes = {}, text = '') => {
   const element = document.createElementNS('http://www.w3.org/2000/svg', elementType);
   Object.entries(attributes).map(a => element.setAttribute(a[0],a[1]));
-  if(!attributes.class) figureInfo.push(attributes);
+  if(!attributes.class && !attributes.points) figureInfo.push(attributes);
   if (text) {
     const textNode = document.createTextNode(text);
     element.appendChild(textNode);
@@ -126,6 +126,8 @@ function Figure(svg, figure){
     this.onFigureDrawEnd?.();
     onpointermove = null;
     onpointerup = null;
+    idx = figureInfo.length - 1;
+    console.log('figureInfo: ', figureInfo);
     ['width', 'height', 'x', 'y', 'rx', 'ry', 'cx', 'cy', 'x1', 'x2', 'y1', 'y2'].map(v => {
       let attr = JSON.parse(f.getAttribute(v));
       if(!attr) return;
@@ -133,19 +135,18 @@ function Figure(svg, figure){
     });
     switch(figure){
       case 'line':
-        resizing(f, [r1, r2], figureInfo, idx++);
+        resizing(f, [r1, r2], figureInfo, idx);
       break;
       case 'arrow':
-        resizing(f, [fp, r1, r2], figureInfo, idx++);
+        resizing(f, [fp, r1, r2], figureInfo, idx);
       break;
       case 'rect':
-        resizing(f, [r1, r2, r3, r4], figureInfo, idx++);
+        resizing(f, [r1, r2, r3, r4], figureInfo, idx);
       break;
       case 'ellipse':
-        resizing(f, [r0, img], figureInfo, idx++);
+        resizing(f, [r0, img], figureInfo, idx);
       break;
     }
-    console.log('thickness: ', thickness);
   }
   this.ondraw = () => { svg.onpointerdown = start; }
 }
