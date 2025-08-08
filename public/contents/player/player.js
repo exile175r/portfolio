@@ -32,6 +32,10 @@ function Player() {
   const $this = this;
   let playTimer;
   $this.currentTime = 0;
+  media.load();
+  media.onloadedmetadata = () => {
+    timeupdate();
+  };
   $this.play = function () {
     updatePlayPauseIcon(true);
     media.play();
