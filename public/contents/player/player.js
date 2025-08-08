@@ -11,10 +11,8 @@ function loadSampleVideo() {
     .then(blob => {
       if (!blob.type.startsWith('video/')) throw new Error('Invalid video type: ' + blob.type);
       const url = URL.createObjectURL(blob);
-      const video = document.getElementById('video');
-      video.removeAttribute('src'); // 기존 src 제거
-      video.load();
-      video.src = url;
+      const video = $frag(`<video src="${url}"></video>`);
+      $('#videoContainer').before(video);
       video.load();
     })
     .catch(err => {
@@ -24,6 +22,8 @@ function loadSampleVideo() {
 }
 
 onload = () => {
+
+loadSampleVideo();
 
 const media = $('video');
 const $playBtn = $('#play');
@@ -47,8 +47,6 @@ const updatePlayPauseIcon = (isPlaying) => {
     $screenIcon.classList.replace('fa-pause', 'fa-play');
   }
 }
-
-loadSampleVideo();
 
 function Player() {
   const $this = this;
