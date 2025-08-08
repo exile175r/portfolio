@@ -2,6 +2,8 @@ const $ = function(sel){return document.querySelector(sel)};
 const $$ = function(sel){return document.querySelectorAll(sel)};
 const $frag = (function(){let range = document.createRange();return function(v){return range.createContextualFragment(v)}})();
 
+onload = () => {
+
 const media = $('video');
 const $playBtn = $('#play');
 const $playIcon = $playBtn.querySelector('i');
@@ -314,3 +316,4 @@ const $introClose = $('#introClose');
 $introClose.onclick = () => {
   $intro.style.display = 'none';
 };
+}
