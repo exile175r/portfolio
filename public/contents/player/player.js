@@ -5,6 +5,7 @@ const $frag = (function(){let range = document.createRange();return function(v){
 onload = () => {
 
 const media = $('video');
+console.log('media: ', media);
 const $playBtn = $('#play');
 const $playIcon = $playBtn.querySelector('i');
 const $progressBar = $("#timeline");
