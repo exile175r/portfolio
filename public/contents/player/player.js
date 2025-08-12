@@ -15,24 +15,72 @@ const $screen = $('#screen');
 const $screenIcon = $screen.querySelector('i');
 let player = { paused: true };
 
+// 페이지 로드 완료 후 영상 상태 확인
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, checking video element...');
+  console.log('Video element:', media);
+  console.log('Initial video src:', media.src);
+  console.log('Video readyState:', media.readyState);
+  console.log('Video networkState:', media.networkState);
+  
+  // 영상 로드 상태 모니터링
+  const checkVideoStatus = () => {
+    console.log('Video status check:');
+    console.log('- src:', media.src);
+    console.log('- readyState:', media.readyState);
+    console.log('- networkState:', media.networkState);
+    console.log('- error:', media.error);
+    console.log('- duration:', media.duration);
+  };
+  
+  // 1초 후 상태 확인
+  setTimeout(checkVideoStatus, 1000);
+  
+  // 3초 후 상태 확인
+  setTimeout(checkVideoStatus, 3000);
+});
+
 // 영상 로드 에러 처리 추가
 media.addEventListener('error', function(e) {
   console.error('Video loading error:', e);
-  // 샘플 영상 로드 실패 시 대체 처리
-  if (media.src.includes('sample.mp4')) {
-    console.log('Sample video failed to load, trying alternative path...');
-    // 상대 경로로 다시 시도
-    media.src = './sample.mp4';
+  console.log('Current video src:', media.src);
+  
+  // 샘플 영상 로드 실패 시 대체 경로들을 시도
+  const alternativePaths = [
+    '/contents/video/sample.mp4',
+    '/video/sample.mp4',
+    './sample.mp4',
+    '../video/sample.mp4'
+  ];
+  
+  const currentIndex = alternativePaths.indexOf(media.src);
+  if (currentIndex >= 0 && currentIndex < alternativePaths.length - 1) {
+    const nextPath = alternativePaths[currentIndex + 1];
+    console.log('Trying alternative path:', nextPath);
+    media.src = nextPath;
+  } else if (currentIndex === -1) {
+    // 현재 src가 목록에 없으면 첫 번째 경로 시도
+    console.log('Trying first alternative path:', alternativePaths[0]);
+    media.src = alternativePaths[0];
+  } else {
+    console.error('All alternative paths failed');
+    // 사용자에게 알림
+    alert('샘플 영상을 로드할 수 없습니다. 영상 파일을 드래그 앤 드롭으로 업로드해주세요.');
   }
 });
 
 // 영상 로드 성공 시 처리
 media.addEventListener('loadeddata', function() {
-  console.log('Video loaded successfully');
+  console.log('Video loaded successfully from:', media.src);
   // 영상 정보 업데이트
   if (media.duration && isFinite(media.duration)) {
     $totalTime.textContent = player.duration();
   }
+});
+
+// 영상 로드 시작 시 처리
+media.addEventListener('loadstart', function() {
+  console.log('Video loading started from:', media.src);
 });
 
 const updatePlayPauseIcon = (isPlaying) => {

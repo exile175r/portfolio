@@ -121,9 +121,9 @@ export default function IframeContainer({ show, onClose, src }){
             border: 'none',
             borderRadius: '6px'
           }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
+          sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads"
         ></iframe>
       )}
     </div>

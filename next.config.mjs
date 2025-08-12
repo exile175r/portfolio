@@ -16,7 +16,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; media-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;"
+            value: "default-src 'self'; media-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; frame-src 'self';"
           }
         ],
       },
@@ -29,6 +29,10 @@ const nextConfig = {
         source: '/contents/:path*',
         destination: '/contents/:path*',
       },
+      {
+        source: '/video/:path*',
+        destination: '/contents/video/:path*',
+      }
     ]
   }
 };
