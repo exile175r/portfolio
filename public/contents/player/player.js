@@ -22,6 +22,13 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Initial video src:', media.src);
   console.log('Video readyState:', media.readyState);
   console.log('Video networkState:', media.networkState);
+  console.log('Current location analysis:', {
+    href: window.location.href,
+    pathname: window.location.pathname,
+    baseUrl: PathManager.getBaseUrl(),
+    expectedVideoPath: '../video/sample.mp4',
+    expectedAbsolutePath: PathManager.toAbsolutePath('../video/sample.mp4')
+  });
   
   // 영상 로드 상태 모니터링
   const checkVideoStatus = () => {
@@ -38,6 +45,35 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 3초 후 상태 확인
   setTimeout(checkVideoStatus, 3000);
+  
+  // 초기 파일 경로 확인 및 최적화
+  const optimizeInitialPath = async () => {
+    const alternativePaths = [
+      '../video/sample.mp4',  // 현재 위치에서 상위의 video 폴더 (올바른 경로)
+      './video/sample.mp4',   // 현재 디렉토리의 video 폴더
+      '../../video/sample.mp4', // 상위의 상위 video 폴더
+      './sample.mp4',         // 현재 디렉토리
+      '/contents/video/sample.mp4', // 절대 경로
+      '/video/sample.mp4'     // 루트 video 폴더
+    ];
+    
+    console.log('Checking initial file paths for optimization...');
+    console.log('Alternative paths to check:', alternativePaths);
+    
+    const existingPath = await PathManager.findExistingFile(alternativePaths);
+    
+    if (existingPath && existingPath !== media.src) {
+      console.log(`Optimizing initial path from ${media.src} to ${existingPath}`);
+      media.src = existingPath;
+    } else if (existingPath) {
+      console.log(`Initial path is already optimal: ${existingPath}`);
+    } else {
+      console.log('No existing files found, keeping initial path');
+    }
+  };
+  
+  // 초기 경로 최적화 실행
+  optimizeInitialPath();
 });
 
 // 경로 관리 유틸리티
@@ -75,6 +111,31 @@ const PathManager = {
     } catch (e) {
       return src.split('/').pop();
     }
+  },
+  
+  // 파일 존재 여부 확인 (HEAD 요청)
+  checkFileExists: async (url) => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok;
+    } catch (error) {
+      console.log(`File check failed for ${url}:`, error);
+      return false;
+    }
+  },
+  
+  // 여러 경로 중 존재하는 파일 찾기
+  findExistingFile: async (paths) => {
+    for (const path of paths) {
+      const absolutePath = PathManager.toAbsolutePath(path);
+      console.log(`Checking if file exists: ${absolutePath}`);
+      const exists = await PathManager.checkFileExists(absolutePath);
+      if (exists) {
+        console.log(`Found existing file: ${absolutePath}`);
+        return path;
+      }
+    }
+    return null;
   }
 };
 
@@ -89,18 +150,42 @@ media.addEventListener('error', function(e) {
     currentSrc: media.currentSrc
   });
   
+  // MediaError 코드별 상세 분석
+  if (media.error) {
+    const errorCode = media.error.code;
+    const errorMessage = media.error.message;
+    console.log(`MediaError Code: ${errorCode}, Message: ${errorMessage}`);
+    
+    switch (errorCode) {
+      case 1: // MEDIA_ERR_ABORTED
+        console.log('Media loading was aborted by user');
+        break;
+      case 2: // MEDIA_ERR_NETWORK
+        console.log('Network error occurred while loading media');
+        break;
+      case 3: // MEDIA_ERR_DECODE
+        console.log('Media decoding error - file may be corrupted');
+        break;
+      case 4: // MEDIA_ERR_SRC_NOT_SUPPORTED
+        console.log('Media source not supported - path or format issue');
+        break;
+      default:
+        console.log('Unknown media error');
+    }
+  }
+  
   // 현재 src에서 파일명 추출
   const currentFileName = PathManager.getFileName(media.src);
   console.log('Current filename:', currentFileName);
   
   // 샘플 영상 로드 실패 시 대체 경로들을 시도
   const alternativePaths = [
-    './video/sample.mp4',
-    '../../video/sample.mp4',
-    '../video/sample.mp4',
-    './sample.mp4',
-    '/contents/video/sample.mp4',
-    '/video/sample.mp4'
+    '../video/sample.mp4',  // 현재 위치에서 상위의 video 폴더 (올바른 경로)
+    './video/sample.mp4',   // 현재 디렉토리의 video 폴더
+    '../../video/sample.mp4', // 상위의 상위 video 폴더
+    './sample.mp4',         // 현재 디렉토리
+    '/contents/video/sample.mp4', // 절대 경로
+    '/video/sample.mp4'     // 루트 video 폴더
   ];
   
   // 현재 시도한 경로가 어떤 것인지 확인
@@ -126,9 +211,9 @@ media.addEventListener('error', function(e) {
       // 현재 src가 목록에 없으면 현재 위치에 맞는 경로 선택
       const baseUrl = PathManager.getBaseUrl();
       if (baseUrl.includes('/contents/player')) {
-        return './video/sample.mp4'; // 현재 디렉토리의 video 폴더
+        return '../video/sample.mp4'; // 현재 위치에서 상위의 video 폴더 (올바른 경로)
       } else if (baseUrl.includes('/contents')) {
-        return '../video/sample.mp4'; // 상위의 video 폴더
+        return './video/sample.mp4'; // contents 디렉토리 내의 video 폴더
       } else {
         return alternativePaths[0]; // 기본값
       }
@@ -143,14 +228,62 @@ media.addEventListener('error', function(e) {
   if (nextPath) {
     console.log('Trying next path:', nextPath);
     console.log('Absolute path would be:', PathManager.toAbsolutePath(nextPath));
-    media.src = nextPath;
+    
+    // 에러 코드 4인 경우 추가 디버깅
+    if (media.error && media.error.code === 4) {
+      console.log('Attempting to fix MEDIA_ERR_SRC_NOT_SUPPORTED...');
+      console.log('Current location:', window.location.href);
+      console.log('File path analysis:', {
+        currentSrc: media.src,
+        nextPath: nextPath,
+        absolutePath: PathManager.toAbsolutePath(nextPath),
+        baseUrl: PathManager.getBaseUrl()
+      });
+      
+      // 파일 존재 여부 자동 확인
+      PathManager.findExistingFile(alternativePaths).then(existingPath => {
+        if (existingPath) {
+          console.log(`Auto-found existing file: ${existingPath}`);
+          media.src = existingPath;
+        } else {
+          console.log('No existing files found, using selected path');
+          media.src = nextPath;
+        }
+      }).catch(error => {
+        console.log('File check failed, using selected path:', error);
+        media.src = nextPath;
+      });
+    } else {
+      media.src = nextPath;
+    }
   } else {
     // 모든 경로 시도 완료
     console.error('All alternative paths failed');
     console.log('Tried paths:', alternativePaths);
     
-    // 사용자에게 알림
-    alert('샘플 영상을 로드할 수 없습니다. 영상 파일을 드래그 앤 드롭으로 업로드해주세요.');
+    // 에러 코드별 사용자 안내
+    let userMessage = '샘플 영상을 로드할 수 없습니다. ';
+    if (media.error) {
+      switch (media.error.code) {
+        case 1:
+          userMessage += '영상 로드가 중단되었습니다.';
+          break;
+        case 2:
+          userMessage += '네트워크 오류가 발생했습니다.';
+          break;
+        case 3:
+          userMessage += '영상 파일이 손상되었을 수 있습니다.';
+          break;
+        case 4:
+          userMessage += '영상 파일 경로를 찾을 수 없습니다.';
+          break;
+        default:
+          userMessage += '알 수 없는 오류가 발생했습니다.';
+      }
+    }
+    userMessage += ' 영상 파일을 드래그 앤 드롭으로 업로드해주세요.';
+    
+    alert(userMessage);
     
     // 마지막으로 한 번 더 시도 (절대 경로)
     const absolutePath = window.location.origin + '/contents/video/sample.mp4';
@@ -173,6 +306,13 @@ media.addEventListener('loadstart', function() {
   console.log('Video loading started from:', media.src);
   console.log('Current location:', window.location.href);
   console.log('Base URL:', PathManager.getBaseUrl());
+  console.log('Full URL analysis:', {
+    origin: window.location.origin,
+    pathname: window.location.pathname,
+    href: window.location.href,
+    videoSrc: media.src,
+    absolutePath: PathManager.toAbsolutePath(media.src)
+  });
 });
 
 // 영상 로드 중 에러 발생 시 처리
