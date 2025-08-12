@@ -15,6 +15,26 @@ const $screen = $('#screen');
 const $screenIcon = $screen.querySelector('i');
 let player = { paused: true };
 
+// 영상 로드 에러 처리 추가
+media.addEventListener('error', function(e) {
+  console.error('Video loading error:', e);
+  // 샘플 영상 로드 실패 시 대체 처리
+  if (media.src.includes('sample.mp4')) {
+    console.log('Sample video failed to load, trying alternative path...');
+    // 상대 경로로 다시 시도
+    media.src = './sample.mp4';
+  }
+});
+
+// 영상 로드 성공 시 처리
+media.addEventListener('loadeddata', function() {
+  console.log('Video loaded successfully');
+  // 영상 정보 업데이트
+  if (media.duration && isFinite(media.duration)) {
+    $totalTime.textContent = player.duration();
+  }
+});
+
 const updatePlayPauseIcon = (isPlaying) => {
   if(isPlaying) {
     $playIcon.classList.replace('fa-play', 'fa-pause');
@@ -233,15 +253,22 @@ const fileDrop = function(e){
         alert('비디오 파일만 업로드할 수 있습니다.');
         return;
       }
+      console.log('Dropped file:', file.name, 'Type:', file.type, 'Size:', file.size);
       const url = URL.createObjectURL(file);
+      console.log('Created blob URL:', url);
       media.src = url;
       media.load();
       media.onloadedmetadata = () => {
+        console.log('Video metadata loaded successfully');
         media.currentTime = 0;
         player.currentTime = 0;
         $totalTime.textContent = player.duration();
         updatePlayPauseIcon(false);
         timeupdate();
+      };
+      media.onerror = (error) => {
+        console.error('Error loading dropped video:', error);
+        alert('영상 파일을 로드하는 중 오류가 발생했습니다.');
       };
     break;
   }

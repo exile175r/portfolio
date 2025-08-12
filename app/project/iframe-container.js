@@ -22,10 +22,30 @@ export default function IframeContainer({ show, onClose, src }){
     const handleLoad = () => {
       console.log('iframe is loaded');
       setLoading(false);
+      
+      // iframe 내부에서 미디어 파일 접근을 위한 설정
+      try {
+        iframe.contentWindow.postMessage({
+          type: 'SETUP_MEDIA_ACCESS',
+          origin: window.location.origin
+        }, '*');
+      } catch (error) {
+        console.log('PostMessage failed:', error);
+      }
+    };
+
+    const handleError = (error) => {
+      console.error('Iframe load error:', error);
+      setLoading(false);
     };
 
     iframe.addEventListener('load', handleLoad);
-    return () => iframe.removeEventListener('load', handleLoad);
+    iframe.addEventListener('error', handleError);
+    
+    return () => {
+      iframe.removeEventListener('load', handleLoad);
+      iframe.removeEventListener('error', handleError);
+    };
   }, [iframeSrc]);
 
   useEffect(() => {
@@ -101,8 +121,9 @@ export default function IframeContainer({ show, onClose, src }){
             border: 'none',
             borderRadius: '6px'
           }}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
           allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
         ></iframe>
       )}
     </div>
