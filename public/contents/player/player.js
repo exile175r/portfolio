@@ -53,14 +53,15 @@ media.addEventListener('error', function(e) {
   
   // 샘플 영상 로드 실패 시 대체 경로들을 시도
   const alternativePaths = [
+    './video/sample.mp4',
     '../../video/sample.mp4',
     '../video/sample.mp4',
-    './video/sample.mp4',
     './sample.mp4',
     '/contents/video/sample.mp4',
   ];
   
   const currentIndex = alternativePaths.indexOf(media.src);
+  console.log('Current index:', currentIndex);
   if (currentIndex >= 0 && currentIndex < alternativePaths.length - 1) {
     const nextPath = alternativePaths[currentIndex + 1];
     console.log('Trying alternative path:', nextPath);
