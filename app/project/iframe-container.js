@@ -123,7 +123,7 @@ export default function IframeContainer({ show, onClose, src }){
           }}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
-          sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads"
+          sandbox="allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-same-origin"
         ></iframe>
       )}
     </div>

@@ -20,6 +20,48 @@ const nextConfig = {
           }
         ],
       },
+      {
+        source: '/contents/video/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Origin, X-Requested-With, Content-Type, Accept, Range'
+          },
+          {
+            key: 'Access-Control-Expose-Headers',
+            value: 'Content-Length, Content-Range'
+          }
+        ],
+      },
+      {
+        source: '/video/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Origin, X-Requested-With, Content-Type, Accept, Range'
+          },
+          {
+            key: 'Access-Control-Expose-Headers',
+            value: 'Content-Length, Content-Range'
+          }
+        ],
+      }
     ]
   },
   // 정적 파일 서빙을 위한 설정

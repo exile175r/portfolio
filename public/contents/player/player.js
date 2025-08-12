@@ -44,13 +44,20 @@ document.addEventListener('DOMContentLoaded', function() {
 media.addEventListener('error', function(e) {
   console.error('Video loading error:', e);
   console.log('Current video src:', media.src);
+  console.log('Error details:', {
+    error: media.error,
+    networkState: media.networkState,
+    readyState: media.readyState,
+    currentSrc: media.currentSrc
+  });
   
   // 샘플 영상 로드 실패 시 대체 경로들을 시도
   const alternativePaths = [
-    '/contents/video/sample.mp4',
-    '/video/sample.mp4',
+    '../../video/sample.mp4',
+    '../video/sample.mp4',
+    './video/sample.mp4',
     './sample.mp4',
-    '../video/sample.mp4'
+    '/contents/video/sample.mp4',
   ];
   
   const currentIndex = alternativePaths.indexOf(media.src);
@@ -81,6 +88,24 @@ media.addEventListener('loadeddata', function() {
 // 영상 로드 시작 시 처리
 media.addEventListener('loadstart', function() {
   console.log('Video loading started from:', media.src);
+});
+
+// 영상 로드 중 에러 발생 시 처리
+media.addEventListener('stalled', function() {
+  console.log('Video loading stalled');
+});
+
+media.addEventListener('suspend', function() {
+  console.log('Video loading suspended');
+});
+
+// 영상 로드 완료 시 처리
+media.addEventListener('canplay', function() {
+  console.log('Video can play');
+});
+
+media.addEventListener('canplaythrough', function() {
+  console.log('Video can play through');
 });
 
 const updatePlayPauseIcon = (isPlaying) => {
