@@ -40,6 +40,44 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(checkVideoStatus, 3000);
 });
 
+// 경로 관리 유틸리티
+const PathManager = {
+  // 현재 페이지의 기본 URL 가져오기
+  getBaseUrl: () => {
+    const currentPath = window.location.pathname;
+    const pathParts = currentPath.split('/');
+    // /contents/player/ 에서 /contents/ 까지
+    return pathParts.slice(0, -1).join('/');
+  },
+  
+  // 상대 경로를 절대 경로로 변환
+  toAbsolutePath: (relativePath) => {
+    const baseUrl = PathManager.getBaseUrl();
+    if (relativePath.startsWith('./')) {
+      return baseUrl + relativePath.substring(1);
+    } else if (relativePath.startsWith('../')) {
+      const pathParts = baseUrl.split('/');
+      const upLevels = (relativePath.match(/\.\.\//g) || []).length;
+      const newPath = pathParts.slice(0, -upLevels).join('/');
+      return newPath + relativePath.replace(/\.\.\//g, '');
+    } else if (relativePath.startsWith('/')) {
+      return window.location.origin + relativePath;
+    } else {
+      return baseUrl + '/' + relativePath;
+    }
+  },
+  
+  // 파일명 추출
+  getFileName: (src) => {
+    try {
+      const url = new URL(src, window.location.href);
+      return url.pathname.split('/').pop();
+    } catch (e) {
+      return src.split('/').pop();
+    }
+  }
+};
+
 // 영상 로드 에러 처리 추가
 media.addEventListener('error', function(e) {
   console.error('Video loading error:', e);
@@ -51,6 +89,10 @@ media.addEventListener('error', function(e) {
     currentSrc: media.currentSrc
   });
   
+  // 현재 src에서 파일명 추출
+  const currentFileName = PathManager.getFileName(media.src);
+  console.log('Current filename:', currentFileName);
+  
   // 샘플 영상 로드 실패 시 대체 경로들을 시도
   const alternativePaths = [
     './video/sample.mp4',
@@ -58,23 +100,62 @@ media.addEventListener('error', function(e) {
     '../video/sample.mp4',
     './sample.mp4',
     '/contents/video/sample.mp4',
+    '/video/sample.mp4'
   ];
   
-  const currentIndex = alternativePaths.indexOf(media.src);
-  console.log('Current index:', currentIndex);
-  console.log('Current src:', media.src);
-  if (currentIndex >= 0 && currentIndex < alternativePaths.length - 1) {
-    const nextPath = alternativePaths[currentIndex + 1];
-    console.log('Trying alternative path:', nextPath);
+  // 현재 시도한 경로가 어떤 것인지 확인
+  let currentPathIndex = -1;
+  for (let i = 0; i < alternativePaths.length; i++) {
+    const path = alternativePaths[i];
+    const pathFileName = path.split('/').pop();
+    if (pathFileName === currentFileName) {
+      currentPathIndex = i;
+      break;
+    }
+  }
+  
+  console.log('Current path index:', currentPathIndex);
+  console.log('Current base URL:', PathManager.getBaseUrl());
+  
+  // 스마트한 경로 선택
+  const selectNextPath = () => {
+    if (currentPathIndex >= 0 && currentPathIndex < alternativePaths.length - 1) {
+      // 다음 경로 시도
+      return alternativePaths[currentPathIndex + 1];
+    } else if (currentPathIndex === -1) {
+      // 현재 src가 목록에 없으면 현재 위치에 맞는 경로 선택
+      const baseUrl = PathManager.getBaseUrl();
+      if (baseUrl.includes('/contents/player')) {
+        return './video/sample.mp4'; // 현재 디렉토리의 video 폴더
+      } else if (baseUrl.includes('/contents')) {
+        return '../video/sample.mp4'; // 상위의 video 폴더
+      } else {
+        return alternativePaths[0]; // 기본값
+      }
+    } else {
+      // 모든 경로 시도 완료
+      return null;
+    }
+  };
+  
+  const nextPath = selectNextPath();
+  
+  if (nextPath) {
+    console.log('Trying next path:', nextPath);
+    console.log('Absolute path would be:', PathManager.toAbsolutePath(nextPath));
     media.src = nextPath;
-  } else if (currentIndex === -1) {
-    // 현재 src가 목록에 없으면 첫 번째 경로 시도
-    console.log('Trying first alternative path:', alternativePaths[0]);
-    media.src = alternativePaths[0];
   } else {
+    // 모든 경로 시도 완료
     console.error('All alternative paths failed');
+    console.log('Tried paths:', alternativePaths);
+    
     // 사용자에게 알림
     alert('샘플 영상을 로드할 수 없습니다. 영상 파일을 드래그 앤 드롭으로 업로드해주세요.');
+    
+    // 마지막으로 한 번 더 시도 (절대 경로)
+    const absolutePath = window.location.origin + '/contents/video/sample.mp4';
+    console.log('Trying absolute path as last resort:', absolutePath);
+    media.src = absolutePath;
   }
 });
 
@@ -90,24 +171,35 @@ media.addEventListener('loadeddata', function() {
 // 영상 로드 시작 시 처리
 media.addEventListener('loadstart', function() {
   console.log('Video loading started from:', media.src);
+  console.log('Current location:', window.location.href);
+  console.log('Base URL:', PathManager.getBaseUrl());
 });
 
 // 영상 로드 중 에러 발생 시 처리
 media.addEventListener('stalled', function() {
-  console.log('Video loading stalled');
+  console.log('Video loading stalled from:', media.src);
 });
 
 media.addEventListener('suspend', function() {
-  console.log('Video loading suspended');
+  console.log('Video loading suspended from:', media.src);
 });
 
 // 영상 로드 완료 시 처리
 media.addEventListener('canplay', function() {
-  console.log('Video can play');
+  console.log('Video can play from:', media.src);
 });
 
 media.addEventListener('canplaythrough', function() {
-  console.log('Video can play through');
+  console.log('Video can play through from:', media.src);
+});
+
+// 영상 로드 실패 시 추가 정보
+media.addEventListener('abort', function() {
+  console.log('Video loading aborted from:', media.src);
+});
+
+media.addEventListener('emptied', function() {
+  console.log('Video emptied from:', media.src);
 });
 
 const updatePlayPauseIcon = (isPlaying) => {
