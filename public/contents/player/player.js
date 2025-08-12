@@ -62,6 +62,7 @@ media.addEventListener('error', function(e) {
   
   const currentIndex = alternativePaths.indexOf(media.src);
   console.log('Current index:', currentIndex);
+  console.log('Current src:', media.src);
   if (currentIndex >= 0 && currentIndex < alternativePaths.length - 1) {
     const nextPath = alternativePaths[currentIndex + 1];
     console.log('Trying alternative path:', nextPath);
