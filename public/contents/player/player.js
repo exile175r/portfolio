@@ -47,13 +47,16 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // 비디오 로드 확인
   console.log('Video loading check completed');
+  
+  // 비디오 경로 자동 수정
+  PathManager.fixVideoPath();
 });
 
 // 간단한 경로 관리 유틸리티
 const PathManager = {
   // 현재 비디오 경로 확인
   getCurrentVideoPath: () => {
-    return media.src || '/contents/player/video/sample.mp4';
+    return media.src || './video/sample.mp4';
   },
   
   // 비디오 로드 상태 확인
@@ -61,6 +64,19 @@ const PathManager = {
     console.log('Current video path:', media.src);
     console.log('Video ready state:', media.readyState);
     console.log('Video network state:', media.networkState);
+  },
+  
+  // 비디오 경로 자동 수정
+  fixVideoPath: () => {
+    const currentSrc = media.src;
+    console.log('Current video src:', currentSrc);
+    
+    // 경로가 잘못되었을 경우 수정
+    if (currentSrc && currentSrc.includes('/contents/player/video/')) {
+      const newSrc = currentSrc.replace('/contents/player/video/', './video/');
+      console.log('Fixing video path from', currentSrc, 'to', newSrc);
+      media.src = newSrc;
+    }
   }
 };
 
@@ -75,12 +91,32 @@ media.addEventListener('error', function(e) {
     currentSrc: media.currentSrc
   });
   
-  // 간단한 에러 처리
+  // 에러 처리 및 경로 수정 시도
   if (media.error) {
     console.log(`MediaError Code: ${media.error.code}, Message: ${media.error.message}`);
     
-    // 에러 코드별 사용자 안내
-    let userMessage = '샘플 영상을 로드할 수 없습니다. ';
+    // 경로 문제인 경우 자동 수정 시도
+    if (media.error.code === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
+      console.log('Attempting to fix video path...');
+      PathManager.fixVideoPath();
+      
+      // 수정된 경로로 다시 로드 시도
+      setTimeout(() => {
+        if (media.error) {
+          console.log('Path fix failed, showing error message');
+          showVideoError();
+        }
+      }, 1000);
+    } else {
+      showVideoError();
+    }
+  }
+});
+
+// 비디오 에러 메시지 표시
+function showVideoError() {
+  let userMessage = '샘플 영상을 로드할 수 없습니다. ';
+  if (media.error) {
     switch (media.error.code) {
       case 1: userMessage += '영상 로드가 중단되었습니다.'; break;
       case 2: userMessage += '네트워크 오류가 발생했습니다.'; break;
@@ -88,11 +124,11 @@ media.addEventListener('error', function(e) {
       case 4: userMessage += '영상 파일 경로를 찾을 수 없습니다.'; break;
       default: userMessage += '알 수 없는 오류가 발생했습니다.';
     }
-    userMessage += ' 영상 파일을 드래그 앤 드롭으로 업로드해주세요.';
-    
-    alert(userMessage);
   }
-});
+  userMessage += ' 영상 파일을 드래그 앤 드롭으로 업로드해주세요.';
+  
+  alert(userMessage);
+}
 
 // 영상 로드 성공 시 처리
 media.addEventListener('loadeddata', function() {
