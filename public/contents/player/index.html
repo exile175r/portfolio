@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; media-src 'self' blob: data: *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com;">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <title>Player</title>
@@ -26,7 +26,7 @@
     <button id="introClose" aria-label="설명 닫기">닫기</button>
   </div>
   <div id="videoContainer" class="video-container">
-    <video id="video" src="/contents/player/video/sample.mp4"></video>
+    <video id="video" src="/contents/player/video/sample.mp4" preload="metadata"></video>
     <div id="screen"><i class="fas fa-play"></i></div>
     <div id="controls" class="controls">
       <div class="timeline-container">

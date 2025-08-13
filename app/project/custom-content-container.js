@@ -632,61 +632,80 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
      return merged;
    }
    
-   // CSS 변수 격리 (메인 앱과 충돌 방지)
+   // CSS 변수 격리 (메인 앱과 충돌 방지) - CORS 안전하게 처리
    isolateCSSVariables() {
      try {
        // Shadow DOM 내부의 CSS 변수들을 격리
        const styleSheets = this.shadowRoot.querySelectorAll('link[rel="stylesheet"]');
        for (const sheet of styleSheets) {
-         if (sheet.sheet) {
-           const cssRules = sheet.sheet.cssRules;
-           for (let i = 0; i < cssRules.length; i++) {
-             const rule = cssRules[i];
-             if (rule instanceof CSSStyleRule && rule.selectorText === ':root') {
-               // :root를 .content-scope로 변경하여 CSS 변수 격리
-               const newSelector = rule.selectorText.replace(':root', '.content-scope');
-               const newRule = `${newSelector} { ${rule.style.cssText} }`;
-               
-               // 기존 규칙 제거하고 새 규칙 추가
-               sheet.sheet.deleteRule(i);
-               sheet.sheet.insertRule(newRule, i);
-               console.log('CSS variable isolated:', rule.selectorText, '→', newSelector);
+         try {
+           // CORS 정책 확인 - 외부 스타일시트는 건너뛰기
+           if (sheet.sheet && sheet.href && sheet.href.startsWith(window.location.origin)) {
+             const cssRules = sheet.sheet.cssRules;
+             for (let i = 0; i < cssRules.length; i++) {
+               const rule = cssRules[i];
+               if (rule instanceof CSSStyleRule && rule.selectorText === ':root') {
+                 // :root를 .content-scope로 변경하여 CSS 변수 격리
+                 const newSelector = rule.selectorText.replace(':root', '.content-scope');
+                 const newRule = `${newSelector} { ${rule.style.cssText} }`;
+                 
+                 // 기존 규칙 제거하고 새 규칙 추가
+                 sheet.sheet.deleteRule(i);
+                 sheet.sheet.insertRule(newRule, i);
+                 console.log('CSS variable isolated:', rule.selectorText, '→', newSelector);
+               }
              }
+           } else if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
+             // 외부 스타일시트는 로그만 남기고 건너뛰기
+             console.log('Skipping external stylesheet for CSS variable isolation:', sheet.href);
            }
+         } catch (sheetError) {
+           // 개별 스타일시트 오류는 무시하고 계속 진행
+           console.log('Skipping stylesheet due to CORS policy:', sheet.href);
          }
        }
      } catch (error) {
-       console.warn('Failed to isolate CSS variables:', error);
+       console.warn('CSS variable isolation completed with warnings:', error);
      }
    }
 
-   // Font Awesome 폰트 경로 수정
+   // Font Awesome 폰트 경로 수정 - CORS 안전하게 처리
    fixFontAwesomePaths() {
      try {
        // CSS 규칙에서 폰트 경로를 절대 경로로 수정
        const styleSheets = this.shadowRoot.querySelectorAll('link[rel="stylesheet"]');
        for (const sheet of styleSheets) {
-         if (sheet.href.includes('font-awesome')) {
-           // Font Awesome CSS의 폰트 경로를 절대 경로로 수정
-           const cssRules = sheet.sheet?.cssRules;
-           if (cssRules) {
-             for (let i = 0; i < cssRules.length; i++) {
-               const rule = cssRules[i];
-               if (rule instanceof CSSFontFaceRule) {
-                 const src = rule.style.getPropertyValue('src');
-                 if (src && src.includes('webfonts/')) {
-                   // 상대 경로를 절대 경로로 변환
-                   const absoluteSrc = src.replace(/webfonts\//g, 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/');
-                   rule.style.setProperty('src', absoluteSrc);
-                   console.log('Fixed font path:', src, '→', absoluteSrc);
+         try {
+           // Font Awesome 스타일시트만 처리
+           if (sheet.href && sheet.href.includes('font-awesome')) {
+             // CORS 정책 확인
+             if (sheet.sheet && sheet.href.startsWith('https://')) {
+               const cssRules = sheet.sheet.cssRules;
+               if (cssRules) {
+                 for (let i = 0; i < cssRules.length; i++) {
+                   const rule = cssRules[i];
+                   if (rule instanceof CSSFontFaceRule) {
+                     const src = rule.style.getPropertyValue('src');
+                     if (src && src.includes('webfonts/')) {
+                       // 상대 경로를 절대 경로로 변환
+                       const absoluteSrc = src.replace(/webfonts\//g, 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/');
+                       rule.style.setProperty('src', absoluteSrc);
+                       console.log('Fixed font path:', src, '→', absoluteSrc);
+                     }
+                   }
                  }
                }
+             } else {
+               console.log('Skipping Font Awesome path fix due to CORS policy:', sheet.href);
              }
            }
+         } catch (sheetError) {
+           // 개별 스타일시트 오류는 무시하고 계속 진행
+           console.log('Skipping Font Awesome stylesheet due to CORS policy:', sheet.href);
          }
        }
      } catch (error) {
-       console.warn('Failed to fix Font Awesome paths:', error);
+       console.warn('Font Awesome path fixing completed with warnings:', error);
      }
    }
 
