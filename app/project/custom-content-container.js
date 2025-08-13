@@ -743,62 +743,67 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
      return elementMapping[projectPath] || defaultElements;
    }
    
-   async convertVideoToBlob(htmlContent) {
-     try {
-       console.log('Converting video to Blob...');
-       
-       // 비디오 파일 경로 추출
-       const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
-       if (!videoMatch) {
-         console.log('No video element found in HTML');
-         return htmlContent;
-       }
-       
-       const videoSrc = videoMatch[1];
-       console.log('Found video src:', videoSrc);
-       
-       // 절대 경로로 변환
-       let absoluteVideoPath = videoSrc;
-       if (!videoSrc.startsWith('http') && !videoSrc.startsWith('//')) {
-         if (videoSrc.startsWith('/')) {
-           absoluteVideoPath = `${window.location.origin}${videoSrc}`;
-         } else {
-           absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
-         }
-       }
-       
-       console.log('Absolute video path:', absoluteVideoPath);
-       
-       // 비디오 파일을 fetch로 가져와서 Blob 생성
-       const response = await fetch(absoluteVideoPath);
-       if (!response.ok) {
-         throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
-       }
-       
-       const videoBlob = await response.blob();
-       const blobURL = URL.createObjectURL(videoBlob);
-       
-       console.log('Video converted to Blob URL:', blobURL);
-       
-       // HTML에서 비디오 src를 Blob URL로 교체
-       const updatedHtml = htmlContent.replace(
-         /(<video[^>]*src=["'])[^"']+(["'][^>]*>)/i,
-         `$1${blobURL}$2`
-       );
-       
-       // Blob URL을 정리할 수 있도록 저장
-       this.videoBlobURLs = this.videoBlobURLs || [];
-       this.videoBlobURLs.push(blobURL);
-       
-       console.log('HTML updated with Blob URL');
-       return updatedHtml;
-       
-     } catch (error) {
-       console.error('Error converting video to Blob:', error);
-       console.log('Falling back to original HTML');
-       return htmlContent;
-     }
-   }
+     async convertVideoToBlob(htmlContent) {
+    try {
+      console.log('Converting video to Blob...');
+      
+      // 비디오 파일 경로 추출
+      const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
+      if (!videoMatch) {
+        console.log('No video element found in HTML');
+        return htmlContent;
+      }
+      
+      const videoSrc = videoMatch[1];
+      console.log('Found video src:', videoSrc);
+      
+      // 파일명 추출 및 로깅
+      const fileName = videoSrc.split('/').pop();
+      console.log('Video filename:', fileName);
+      
+      // 절대 경로로 변환
+      let absoluteVideoPath = videoSrc;
+      if (!videoSrc.startsWith('http') && !videoSrc.startsWith('//')) {
+        if (videoSrc.startsWith('/')) {
+          absoluteVideoPath = `${window.location.origin}${videoSrc}`;
+        } else {
+          absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
+        }
+      }
+      
+      console.log('Absolute video path:', absoluteVideoPath);
+      
+      // 비디오 파일을 fetch로 가져와서 Blob 생성
+      const response = await fetch(absoluteVideoPath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
+      }
+      
+      const videoBlob = await response.blob();
+      const blobURL = URL.createObjectURL(videoBlob);
+      
+      console.log('Video converted to Blob URL:', blobURL);
+      console.log('Video file size:', (videoBlob.size / 1024 / 1024).toFixed(2), 'MB');
+      
+      // HTML에서 비디오 src를 Blob URL로 교체
+      const updatedHtml = htmlContent.replace(
+        /(<video[^>]*src=["'])[^"']+(["'][^>]*>)/i,
+        `$1${blobURL}$2`
+      );
+      
+      // Blob URL을 정리할 수 있도록 저장
+      this.videoBlobURLs = this.videoBlobURLs || [];
+      this.videoBlobURLs.push(blobURL);
+      
+      console.log('HTML updated with Blob URL');
+      return updatedHtml;
+      
+    } catch (error) {
+      console.error('Error converting video to Blob:', error);
+      console.log('Falling back to original HTML');
+      return htmlContent;
+    }
+  }
   }; // 클래스 정의 완료
 }
 
