@@ -115,23 +115,18 @@ class ProjectContent extends HTMLElement {
         console.log('Step 1.5: Waiting for CSS and fonts to be applied...');
         if (this.currentProjectPath === '/contents/player') {
           // Player 프로젝트는 폰트 로딩을 위해 더 오래 대기
-          await new Promise(resolve => setTimeout(resolve, 3000));
+          await new Promise(resolve => setTimeout(resolve, 2000));
           console.log('Font Awesome fonts should be ready now');
           
-          // 폰트 로딩 상태 확인
+          // 폰트 로딩 상태 확인 (간소화)
           try {
             const testElement = document.createElement('i');
             testElement.className = 'fas fa-play';
-            testElement.style.fontFamily = 'Font Awesome 6 Free';
             this.shadowRoot.appendChild(testElement);
             
-            // 폰트가 로딩되었는지 확인
+            // 간단한 폰트 확인
             const computedStyle = window.getComputedStyle(testElement);
-            const fontFamily = computedStyle.fontFamily;
-            console.log('Font loading check:', {
-              fontFamily: fontFamily,
-              isFontAwesome: fontFamily.includes('Font Awesome')
-            });
+            console.log('Font loading check completed');
             
             // 테스트 요소 제거
             this.shadowRoot.removeChild(testElement);
@@ -697,14 +692,14 @@ class ProjectContent extends HTMLElement {
    getRequiredElements() {
      const projectPath = this.currentProjectPath;
      
-            // 프로젝트별 메인 컨테이너 요소 (하나만 사용)
-       const elementMapping = {
-         '/contents/canvas': ['#canvas', '#drawTool', '#figure', '#textBox'],
-         '/contents/svg_animation': ['#wrap'],
-         '/contents/player': ['#videoContainer'],
-         '/contents/omok': ['#wrap'],
-         '/contents/solitaire': ['#wrap']
-       };
+     // 프로젝트별 메인 컨테이너 요소 (하나만 사용)
+     const elementMapping = {
+       '/contents/canvas': ['#canvas', '#drawTool', '#figure', '#textBox'],
+       '/contents/svg_animation': ['#wrap'],
+       '/contents/player': ['#videoContainer', '#video'],
+       '/contents/omok': ['#wrap'],
+       '/contents/solitaire': ['#wrap']
+     };
      
      // 기본값: 일반적인 컨테이너 요소들
      const defaultElements = ['#content', 'main', 'article', 'section', '#wrap'];

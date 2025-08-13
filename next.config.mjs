@@ -77,6 +77,11 @@ const nextConfig = {
         destination: '/contents/video/:path*',
       }
     ]
+  },
+  
+  // 정적 파일 경로 설정
+  experimental: {
+    outputFileTracingRoot: process.cwd(),
   }
 };
 
