@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 
-// Web Component 정의
-class ProjectContent extends HTMLElement {
+// Web Component 정의 (클라이언트 사이드에서만)
+let ProjectContent;
+if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
+  ProjectContent = class extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -707,10 +709,11 @@ class ProjectContent extends HTMLElement {
      // 프로젝트별 요소가 있으면 사용, 없으면 기본값 사용
      return elementMapping[projectPath] || defaultElements;
    }
+  }; // 클래스 정의 완료
 }
 
-// Web Component 등록
-if (typeof window !== 'undefined' && !customElements.get('project-content')) {
+// Web Component 등록 (클라이언트 사이드에서만)
+if (typeof window !== 'undefined' && typeof customElements !== 'undefined' && !customElements.get('project-content')) {
   customElements.define('project-content', ProjectContent);
 }
 
