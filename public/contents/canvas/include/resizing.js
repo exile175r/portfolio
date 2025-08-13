@@ -4,38 +4,11 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
     let rad = Math.atan2(y2 - y1, x2 - x1);
     return (rad*180)/Math.PI ;
   }
-  // const calcAngleDegrees = (x, y) => Math.atan2(y, x) * 180 / Math.PI;
   const targetInfo = [];
-  console.log('figureInfo: ', figureInfo);
-  console.log('idx: ', idx);
   const fig = figureInfo[idx];
   const minSize = 20;
   let $t, prevX, prevY, parentInfo, parentStyle;
-  // let center, startAngle, moveAngle, rotation;
-  // rotate.onpointerdown = ({target}) => {
-  //   $t = target;
-  //   console.log(fig);
-  //   center = {x: (fig.x + (JSON.parse(fig.width)/2)), y: (fig.y + (JSON.parse(fig.height)/2))}
-  //   prevX = (fig.x - center.x) / zoom;
-  //   prevY = (fig.y - center.y) / zoom;
-  //   startAngle = calcAngleDegrees(prevX, prevY);
-  //   const parent = $t.closest('g');
-  //   parentStyle = parent.style.transform || null;
-  //   parent.style.transformOrigin = `${center.x}px ${center.y}px`;
-  //   console.log('parentStyle: ', parentStyle);
-  //   onpointermove = rotateMove;
-  //   onpointerup = rotateEnd;
-  // }
-  // const rotateMove = ({x, y}) => {
-  //   moveAngle = calcAngleDegrees((x - center.x) / zoom, (y - center.y) / zoom);
-  //   rotation = moveAngle - startAngle;
-  //   $t.closest('g').style.transform = `${parentStyle ? parentStyle : ''} rotate(${rotation}deg)`;
-  // }
-  // const rotateEnd = () => {
-  //   onpointermove = null;
-  //   onpointerup = null;
-  //   $t = null, center = null, startAngle = null, moveAngle = null, rotation = null, parentStyle = null;
-  // }
+  const {left: cvsL, top: cvsT} = $('#canvas').getBoundingClientRect();
   targetList.forEach(($, i) => {
     targetInfo.push({x: JSON.parse($.getAttribute('x')), y: JSON.parse($.getAttribute('y'))});
     $.onpointerdown = ({target}) => {
@@ -45,24 +18,18 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
                    parentStyle.replace(/translate\(|px,|px\)/g, '').split(' ').map(v =>  JSON.parse(v))
                    :
                    [0, 0];
-      prevX = (targetInfo[i].x + parentInfo[0]) / zoom;
-      prevY = (targetInfo[i].y + parentInfo[1]) / zoom;
+      prevX = (targetInfo[i].x + parentInfo[0]) - cvsL / zoom;
+      prevY = (targetInfo[i].y + parentInfo[1]) - cvsT / zoom;
       
       thickness = JSON.parse(figure.getAttribute('stroke-width'));
-      console.log('thickness: ', thickness);
-
-
-      if(figure.closest('g').classList[0] == 'arrow'){
-        
-      }
       
       onpointermove = resizingMove;
       onpointerup = resizingEnd;
     }
     
     const resizingMove = ({x, y}) => {
-      const moveX = (x / zoom - prevX);
-      const moveY = (y / zoom - prevY);
+      const moveX = ((x - cvsL) / zoom - prevX);
+      const moveY = ((y - cvsT) / zoom - prevY);
 
       switch (figure.closest('g').classList[0]) {
         case 'line':

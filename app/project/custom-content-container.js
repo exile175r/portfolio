@@ -55,9 +55,11 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         console.log('No body tag found, using full HTML');
       }
       
-      // 비디오 요소를 Blob으로 변환하는 로직 추가
+      // 비디오 요소를 Blob으로 변환하는 로직 추가 (Player 프로젝트 강제 실행)
       if (this.currentProjectPath.includes('/player')) {
+        console.log('Player project detected, forcing video Blob conversion...');
         bodyContent = await this.convertVideoToBlob(bodyContent);
+        console.log('Video Blob conversion completed');
       }
       
       // head에서 CSS와 JS 추출 (정규식 사용)
@@ -743,16 +745,19 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
      return elementMapping[projectPath] || defaultElements;
    }
    
-     async convertVideoToBlob(htmlContent) {
-    try {
-      console.log('Converting video to Blob...');
-      
-      // 비디오 파일 경로 추출
-      const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
-      if (!videoMatch) {
-        console.log('No video element found in HTML');
-        return htmlContent;
-      }
+        async convertVideoToBlob(htmlContent) {
+     try {
+       console.log('=== VIDEO BLOB CONVERSION START ===');
+       console.log('HTML content length:', htmlContent.length);
+       console.log('HTML preview:', htmlContent.substring(0, 500) + '...');
+       
+       // 비디오 파일 경로 추출
+       const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
+       if (!videoMatch) {
+         console.log('❌ No video element found in HTML');
+         console.log('HTML content:', htmlContent);
+         return htmlContent;
+       }
       
       const videoSrc = videoMatch[1];
       console.log('Found video src:', videoSrc);
@@ -798,12 +803,17 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       console.log('HTML updated with Blob URL');
       return updatedHtml;
       
-    } catch (error) {
-      console.error('Error converting video to Blob:', error);
-      console.log('Falling back to original HTML');
-      return htmlContent;
-    }
-  }
+         } catch (error) {
+       console.error('❌ Error converting video to Blob:', error);
+       console.error('Error details:', {
+         name: error.name,
+         message: error.message,
+         stack: error.stack
+       });
+       console.log('🔄 Falling back to original HTML');
+       return htmlContent;
+     }
+   }
   }; // 클래스 정의 완료
 }
 
