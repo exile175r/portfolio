@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
 const PathManager = {
   // 현재 비디오 경로 확인
   getCurrentVideoPath: () => {
-    return media.src || './video/sample.mp4';
+    return media.src || '/contents/player/video/sample.mp4';
   },
   
   // 비디오 로드 상태 확인
@@ -71,9 +71,10 @@ const PathManager = {
     const currentSrc = media.src;
     console.log('Current video src:', currentSrc);
     
-    // 경로가 잘못되었을 경우 수정
-    if (currentSrc && currentSrc.includes('/contents/player/video/')) {
-      const newSrc = currentSrc.replace('/contents/player/video/', './video/');
+    // 잘못된 경로를 올바른 절대 경로로 수정
+    if (currentSrc && !currentSrc.includes('/contents/player/video/')) {
+      const baseUrl = window.location.origin;
+      const newSrc = `${baseUrl}/contents/player/video/sample.mp4`;
       console.log('Fixing video path from', currentSrc, 'to', newSrc);
       media.src = newSrc;
     }
@@ -100,13 +101,15 @@ media.addEventListener('error', function(e) {
       console.log('Attempting to fix video path...');
       PathManager.fixVideoPath();
       
-      // 수정된 경로로 다시 로드 시도
+      // 수정된 경로로 다시 로드 시도 (더 긴 대기 시간)
       setTimeout(() => {
         if (media.error) {
           console.log('Path fix failed, showing error message');
           showVideoError();
+        } else {
+          console.log('Path fix successful, video should load now');
         }
-      }, 1000);
+      }, 2000);
     } else {
       showVideoError();
     }
@@ -388,10 +391,10 @@ const fileDrop = function(e){
     break;
   }
 }
-addEventListener('dragover', fileDrop);
-addEventListener('dragenter', fileDrop);
-addEventListener('dragleave', fileDrop);
-addEventListener('drop', fileDrop);
+root.addEventListener('dragover', fileDrop);
+root.addEventListener('dragenter', fileDrop);
+root.addEventListener('dragleave', fileDrop);
+root.addEventListener('drop', fileDrop);
 
 // 접근성: aria-label 추가
 $playBtn.setAttribute('aria-label', '재생/일시정지');
