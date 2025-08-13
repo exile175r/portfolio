@@ -55,6 +55,11 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         console.log('No body tag found, using full HTML');
       }
       
+      // 비디오 요소를 Blob으로 변환하는 로직 추가
+      if (this.currentProjectPath.includes('/player')) {
+        bodyContent = await this.convertVideoToBlob(bodyContent);
+      }
+      
       // head에서 CSS와 JS 추출 (정규식 사용)
       const headLinks = [];
       const headScripts = [];
@@ -550,6 +555,15 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
     // script는 DOM 요소가 아니므로 정리만
     this.scripts = [];
     
+    // Blob URL 정리 (메모리 누수 방지)
+    if (this.videoBlobURLs) {
+      this.videoBlobURLs.forEach(blobURL => {
+        URL.revokeObjectURL(blobURL);
+        console.log('Blob URL revoked:', blobURL);
+      });
+      this.videoBlobURLs = [];
+    }
+    
          // 전역 변수 정리
      if (window.__shadowRoot__) {
        delete window.__shadowRoot__;
@@ -727,6 +741,63 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
      
      // 프로젝트별 요소가 있으면 사용, 없으면 기본값 사용
      return elementMapping[projectPath] || defaultElements;
+   }
+   
+   async convertVideoToBlob(htmlContent) {
+     try {
+       console.log('Converting video to Blob...');
+       
+       // 비디오 파일 경로 추출
+       const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
+       if (!videoMatch) {
+         console.log('No video element found in HTML');
+         return htmlContent;
+       }
+       
+       const videoSrc = videoMatch[1];
+       console.log('Found video src:', videoSrc);
+       
+       // 절대 경로로 변환
+       let absoluteVideoPath = videoSrc;
+       if (!videoSrc.startsWith('http') && !videoSrc.startsWith('//')) {
+         if (videoSrc.startsWith('/')) {
+           absoluteVideoPath = `${window.location.origin}${videoSrc}`;
+         } else {
+           absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
+         }
+       }
+       
+       console.log('Absolute video path:', absoluteVideoPath);
+       
+       // 비디오 파일을 fetch로 가져와서 Blob 생성
+       const response = await fetch(absoluteVideoPath);
+       if (!response.ok) {
+         throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
+       }
+       
+       const videoBlob = await response.blob();
+       const blobURL = URL.createObjectURL(videoBlob);
+       
+       console.log('Video converted to Blob URL:', blobURL);
+       
+       // HTML에서 비디오 src를 Blob URL로 교체
+       const updatedHtml = htmlContent.replace(
+         /(<video[^>]*src=["'])[^"']+(["'][^>]*>)/i,
+         `$1${blobURL}$2`
+       );
+       
+       // Blob URL을 정리할 수 있도록 저장
+       this.videoBlobURLs = this.videoBlobURLs || [];
+       this.videoBlobURLs.push(blobURL);
+       
+       console.log('HTML updated with Blob URL');
+       return updatedHtml;
+       
+     } catch (error) {
+       console.error('Error converting video to Blob:', error);
+       console.log('Falling back to original HTML');
+       return htmlContent;
+     }
    }
   }; // 클래스 정의 완료
 }

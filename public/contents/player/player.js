@@ -447,7 +447,7 @@ document.addEventListener('keydown', (e) => {
       e.preventDefault();
     break;
   }
-  const $controlBar = $('.controls');
+  const $controlBar = $('#controls');
   $controlBar.style.opacity = 1;
   delay = setTimeout(() => {
     $controlBar.style.opacity = null;
