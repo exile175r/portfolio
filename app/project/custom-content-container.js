@@ -766,13 +766,40 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       const fileName = videoSrc.split('/').pop();
       console.log('Video filename:', fileName);
       
-      // 절대 경로로 변환
+      // 절대 경로로 변환 (환경 감지)
       let absoluteVideoPath = videoSrc;
       if (!videoSrc.startsWith('http') && !videoSrc.startsWith('//')) {
-        if (videoSrc.startsWith('/')) {
-          absoluteVideoPath = `${window.location.origin}${videoSrc}`;
+        // 현재 실행 환경 확인 (강화된 감지)
+        console.log('🔍 Environment detection:', {
+          href: window.location.href,
+          origin: window.location.origin,
+          hostname: window.location.hostname,
+          port: window.location.port,
+          protocol: window.location.protocol
+        });
+        
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isLocalNetwork = window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('172.');
+        const isLocalPort = window.location.port === '3000' || window.location.port === '3001';
+        
+        // 로컬 환경 강제 감지
+        if (isLocalhost || isLocalNetwork || isLocalPort || window.location.protocol === 'http:') {
+          // 로컬 환경: localhost:3000 사용
+          const localOrigin = `http://${window.location.hostname}:${window.location.port}`;
+          if (videoSrc.startsWith('/')) {
+            absoluteVideoPath = `${localOrigin}${videoSrc}`;
+          } else {
+            absoluteVideoPath = `${localOrigin}${this.currentProjectPath}/${videoSrc}`;
+          }
+          console.log('🌐 Local environment detected, using:', localOrigin);
         } else {
-          absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
+          // 배포 환경: 현재 origin 사용
+          if (videoSrc.startsWith('/')) {
+            absoluteVideoPath = `${window.location.origin}${videoSrc}`;
+          } else {
+            absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
+          }
+          console.log('🚀 Production environment detected, using:', window.location.origin);
         }
       }
       
@@ -785,10 +812,21 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       }
       
       const videoBlob = await response.blob();
-      const blobURL = URL.createObjectURL(videoBlob);
       
+      // 파일 크기 검증
+      const fileSizeMB = (videoBlob.size / 1024 / 1024).toFixed(2);
+      console.log('Video file size:', fileSizeMB, 'MB');
+      
+      if (videoBlob.size === 0) {
+        throw new Error('Video file is empty (0 bytes) - fetch failed or file not found');
+      }
+      
+      if (parseFloat(fileSizeMB) < 0.01) {
+        console.warn('⚠️ Video file is very small:', fileSizeMB, 'MB - might be corrupted');
+      }
+      
+      const blobURL = URL.createObjectURL(videoBlob);
       console.log('Video converted to Blob URL:', blobURL);
-      console.log('Video file size:', (videoBlob.size / 1024 / 1024).toFixed(2), 'MB');
       
       // HTML에서 비디오 src를 Blob URL로 교체
       const updatedHtml = htmlContent.replace(
