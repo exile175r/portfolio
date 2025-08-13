@@ -8,8 +8,8 @@ const $color = $('.colorPicker');
 let thickness = 10, colorPick, drawTool = 'pen', colors = '#000';
 let isDraw = true;
 
-const canvas = document.getElementById('canvas');
-const highlightCanvas = document.getElementById('highlightCanvas');
+const canvas = $('#canvas');
+const highlightCanvas = $('#highlightCanvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 highlightCanvas.width = canvas.width;
@@ -73,7 +73,7 @@ const displayColor = (color) => {
   $drawTool.querySelector('.colorBox').style.backgroundColor = color;
 }
 
-addEventListener('pointerdown', ({target}) => {
+root.addEventListener('pointerdown', ({target}) => {
   if(isDraw){
     if(target.tagName == 'g' ||
       target.parentNode.tagName == 'g' ||
@@ -88,7 +88,7 @@ addEventListener('pointerdown', ({target}) => {
        target.closest('[data-color]') ||
        target.closest('[for$="_color"]')
       ) return;
-
+    console.log('target: ', target);
     $textBox.querySelector('.text.on')?.classList.remove('on');
   }
 });
@@ -434,7 +434,7 @@ $textAdd.onclick = () => {
   $textBox.append($frag(`
     <div class="text on">
       <textarea name="textarea" spellcheck="false"></textarea>
-      <button><img src="img/close_button.svg"></button>
+      <button><img src="contents/canvas/img/close_button.svg"></button>
     </div>
   `));
   const $text = $textBox.querySelector('.text:last-child');
@@ -537,9 +537,6 @@ $fontSelect.oninput = ({target}) => {
   fontSet.f = target.selectedOptions[0].value;
   $textarea.style.fontFamily = fontSet.f;
 }
-
-
-
 
 $('input[type="range"]#gauge').oninput = ({target}) => {
   const min = target.min;

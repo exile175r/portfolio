@@ -8,6 +8,7 @@ const newSVGTag = (elementType, attributes = {}, text = '') => {
   }
   return element;
 }
+const {left: cvsL, top: cvsT} = $('#canvas').getBoundingClientRect();
 function Figure(svg, figure){
   const svgTagBundle = (arr, svg, figure) => {
     const g = newSVGTag('g', {'class': `${figure} on`});
@@ -21,11 +22,13 @@ function Figure(svg, figure){
   // this.color = '#000';
   // this.thickness = 10;
   let prevX, prevY;
-  let f, fp, r0, r1, r2, r3, r4;
+  let f, fp, r0, r1, r2, r3, r4, img;
   let rAttr;
   const start = ({target, x, y}) => {
     if(target != svg) return;
     this.onFigureDrawStart?.();
+    x -= cvsL / zoom;
+    y -= cvsT / zoom;
     switch(figure){
       case 'line':
         f = newSVGTag(figure, {'x1': x, 'y1': y, 'x2': x, 'y2': y, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'none'});
@@ -52,7 +55,7 @@ function Figure(svg, figure){
       case 'ellipse':
         f = newSVGTag(figure, {'cx': x, 'cy': y, 'rx': 0, 'ry': 0, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'transparent', 'style': `transform-origin: ${x}px ${y}px;`});
         r0 = newSVGTag('rect', {class: 'reBox', 'x': x, 'y': y, 'width': 0, 'height': 0, 'stroke': '#1884ec', 'stroke-width': 1, 'fill': 'none', 'style': `transform-origin: ${x}px ${y}px;`});
-        img = newSVGTag('image', {class: 're', 'href': './img/resize_button.svg', 'x': x, 'y': y, 'width': 20, 'height': 20, 'fill': 'none'});
+        img = newSVGTag('image', {class: 're', 'href': 'contents/canvas/img/resize_button.svg', 'x': x, 'y': y, 'width': 20, 'height': 20, 'fill': 'none'});
         svgTagBundle([f, r0, img], svg, figure);
       break;
     }
@@ -62,6 +65,8 @@ function Figure(svg, figure){
     onpointerup = end;
   }
   const move = ({x, y}) => {
+    x -= cvsL / zoom;
+    y -= cvsT / zoom;
     switch(figure){
       case 'line':
         f.setAttribute('x2', x);

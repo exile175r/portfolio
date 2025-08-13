@@ -1,5 +1,6 @@
-const $ = function(sel){return document.querySelector(sel)};
-const $$ = function(sel){return document.querySelectorAll(sel)};
+let root = document.querySelector('project-content') ? document.querySelector('project-content').shadowRoot : document;
+const $ = function(sel){return root.querySelector(sel)};
+const $$ = function(sel){return root.querySelectorAll(sel)};
 const $frag = (function(){let range = document.createRange();return function(v){return range.createContextualFragment(v)}})();
 
 const media = $('video');
@@ -59,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Checking initial file paths for optimization...');
     console.log('Alternative paths to check:', alternativePaths);
+    console.log('Current location pathname:', window.location.pathname);
+    console.log('Expected correct path: /contents/video/sample.mp4');
     
     const existingPath = await PathManager.findExistingFile(alternativePaths);
     
@@ -89,17 +92,31 @@ const PathManager = {
   // 상대 경로를 절대 경로로 변환
   toAbsolutePath: (relativePath) => {
     const baseUrl = PathManager.getBaseUrl();
+    console.log('toAbsolutePath input:', { relativePath, baseUrl });
+    
     if (relativePath.startsWith('./')) {
-      return baseUrl + relativePath.substring(1);
+      // 현재 디렉토리 기준
+      const result = baseUrl + relativePath.substring(1);
+      console.log('toAbsolutePath ./ result:', result);
+      return result;
     } else if (relativePath.startsWith('../')) {
-      const pathParts = baseUrl.split('/');
+      // 상위 디렉토리로 이동
+      const pathParts = baseUrl.split('/').filter(part => part.length > 0);
       const upLevels = (relativePath.match(/\.\.\//g) || []).length;
       const newPath = pathParts.slice(0, -upLevels).join('/');
-      return newPath + relativePath.replace(/\.\.\//g, '');
+      const result = '/' + newPath + '/' + relativePath.replace(/\.\.\//g, '');
+      console.log('toAbsolutePath ../ result:', result);
+      return result;
     } else if (relativePath.startsWith('/')) {
-      return window.location.origin + relativePath;
+      // 절대 경로
+      const result = window.location.origin + relativePath;
+      console.log('toAbsolutePath / result:', result);
+      return result;
     } else {
-      return baseUrl + '/' + relativePath;
+      // 기본 경로
+      const result = baseUrl + '/' + relativePath;
+      console.log('toAbsolutePath default result:', result);
+      return result;
     }
   },
   
@@ -116,8 +133,21 @@ const PathManager = {
   // 파일 존재 여부 확인 (HEAD 요청)
   checkFileExists: async (url) => {
     try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok;
+      // URL이 상대 경로인 경우 절대 경로로 변환
+      let fullUrl = url;
+      if (!url.startsWith('http')) {
+        if (url.startsWith('/')) {
+          fullUrl = window.location.origin + url;
+        } else {
+          fullUrl = window.location.origin + '/' + url;
+        }
+      }
+      
+      console.log(`Checking file existence: ${fullUrl}`);
+      const response = await fetch(fullUrl, { method: 'HEAD' });
+      const exists = response.ok;
+      console.log(`File ${fullUrl} exists: ${exists}`);
+      return exists;
     } catch (error) {
       console.log(`File check failed for ${url}:`, error);
       return false;
@@ -127,8 +157,28 @@ const PathManager = {
   // 여러 경로 중 존재하는 파일 찾기
   findExistingFile: async (paths) => {
     for (const path of paths) {
-      const absolutePath = PathManager.toAbsolutePath(path);
-      console.log(`Checking if file exists: ${absolutePath}`);
+      console.log(`Checking path: ${path}`);
+      
+      // 상대 경로를 절대 경로로 변환
+      let absolutePath;
+      if (path.startsWith('./')) {
+        // 현재 디렉토리 기준
+        absolutePath = window.location.pathname.replace(/\/[^\/]*$/, '') + path.substring(1);
+      } else if (path.startsWith('../')) {
+        // 상위 디렉토리로 이동
+        const pathParts = window.location.pathname.split('/').filter(part => part.length > 0);
+        const upLevels = (path.match(/\.\.\//g) || []).length;
+        const newPath = pathParts.slice(0, -upLevels).join('/');
+        absolutePath = '/' + newPath + '/' + path.replace(/\.\.\//g, '');
+      } else if (path.startsWith('/')) {
+        // 절대 경로
+        absolutePath = path;
+      } else {
+        // 기본 경로
+        absolutePath = window.location.pathname.replace(/\/[^\/]*$/, '') + '/' + path;
+      }
+      
+      console.log(`Converted to absolute path: ${absolutePath}`);
       const exists = await PathManager.checkFileExists(absolutePath);
       if (exists) {
         console.log(`Found existing file: ${absolutePath}`);
@@ -233,11 +283,14 @@ media.addEventListener('error', function(e) {
     if (media.error && media.error.code === 4) {
       console.log('Attempting to fix MEDIA_ERR_SRC_NOT_SUPPORTED...');
       console.log('Current location:', window.location.href);
+      console.log('Current pathname:', window.location.pathname);
       console.log('File path analysis:', {
         currentSrc: media.src,
         nextPath: nextPath,
         absolutePath: PathManager.toAbsolutePath(nextPath),
-        baseUrl: PathManager.getBaseUrl()
+        baseUrl: PathManager.getBaseUrl(),
+        expectedCorrectPath: '/contents/video/sample.mp4',
+        expectedCorrectUrl: window.location.origin + '/contents/video/sample.mp4'
       });
       
       // 파일 존재 여부 자동 확인

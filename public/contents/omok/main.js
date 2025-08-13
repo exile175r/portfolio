@@ -1,5 +1,6 @@
-const $ = function (sel) { return document.querySelector(sel) };
-const $$ = function (sel) { return document.querySelectorAll(sel) };
+let root = document.querySelector('project-content') ? document.querySelector('project-content').shadowRoot : document;
+const $ = function (sel) { return root.querySelector(sel) };
+const $$ = function (sel) { return root.querySelectorAll(sel) };
 const $frag = (function () { let range = document.createRange(); return function (v) { return range.createContextualFragment(v) } })();
 
 let scale, scaleL;

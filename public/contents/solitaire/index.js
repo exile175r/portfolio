@@ -1,5 +1,6 @@
-const $ = function(sel){return document.querySelector(sel)};
-const $$ = function(sel){return document.querySelectorAll(sel)};
+let root = document.querySelector('project-content') ? document.querySelector('project-content').shadowRoot : document;
+const $ = function(sel){return root.querySelector(sel)};
+const $$ = function(sel){return root.querySelectorAll(sel)};
 const $frag = (function(){let range = document.createRange();return function(v){return range.createContextualFragment(v)}})();
 
 const number = [1,2,3,4,5,6,7,8,9,10,11,12,13];
@@ -110,7 +111,7 @@ const move = ({x, y}) => {
 const end = ({x, y}) => {
   if(isList) dragList.forEach($ => $.removeAttribute('style'));
   else $this.removeAttribute('style');
-  const $area = document.elementFromPoint(x, y);
+  const $area = root.elementFromPoint(x, y);
   const dropParent = $area.parentNode;
   const dataType = $area.dataset.type;
   let isChild = true, isDrop = false, clones;
@@ -184,9 +185,11 @@ const end = ({x, y}) => {
   onpointerup = null;
 
   // Clear!!!!
-  if([...$$('#drop > div')].map(v => +v.dataset.drag).every(v => v == 15)){
-    alert('Clear!!!!');
-  }
+  setTimeout(() => {
+    if([...$$('#drop > div')].map(v => +v.dataset.drag).every(v => v == 15)){
+      alert('Clear!!!!');
+    }
+  }, 500);
 }
 
 const $$dropBox = $$('#drop > div');

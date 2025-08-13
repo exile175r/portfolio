@@ -2,7 +2,8 @@
 const nextConfig = {
   images: {
     domains: [
-      'www.notion.so'
+      'www.notion.so',
+      'via.placeholder.com'
     ]
   },
   async headers() {
@@ -16,7 +17,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; media-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; frame-src 'self';"
+            value: "default-src 'self'; media-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; frame-src 'self';"
           }
         ],
       },

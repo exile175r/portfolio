@@ -1,4 +1,6 @@
-const $ = function(sel){return document.querySelector(sel)};
+console.log('=========draw.js=========');
+let root = document.querySelector('project-content') ? document.querySelector('project-content').shadowRoot : document;
+const $ = function(sel){return root.querySelector(sel)};
 
 function Draw(canvas){
   this.ctx = canvas.getContext('2d', {willReadFrequently: true});
@@ -181,7 +183,7 @@ const coordinatesToPathD = (coords) => {
   return convertToLowercaseCommands(d);
 }
 
-const canvas = document.getElementById('canvas');
+const canvas = root.getElementById('canvas');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 let zoom = 1;
@@ -198,6 +200,9 @@ paint.ondrawstart = () => {
 }
 // paint.ondrawmove = (x, y) => {}
 paint.ondrawend = (x, y) => {
+  const {left, top} = canvas.getBoundingClientRect();
+  x -= left / zoom;
+  y -= top / zoom;
   const coordinates = paint.coordinates;
   pathD = coordinatesToPathD(coordinates);
 
@@ -209,7 +214,7 @@ paint.ondrawend = (x, y) => {
 }
 
 let idNo = 0;
-const $box = document.querySelector("#svgBox");
+const $box = $('#svgBox');
 $startBtn.onclick = () => {
   if(pathD){
     $box.textContent = '';

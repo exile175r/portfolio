@@ -1,29 +1,57 @@
 'use client';
 import { useState } from 'react';
 import ProjectItem from "./project-item";
-import IframeContainer from "./iframe-container"
+import CustomContentContainer from "./custom-content-container"
 
 export default function ProjectContent({ projects }) {
-  const [showIframe, setShowIframe] = useState(false);
+  const [showContent, setShowContent] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState('');
 
-  // 프로젝트 ID에 따른 iframe src 매핑
-  const projectUrls = {
-    'project1': '/contents/canvas/index.html',
-    'project2': '/contents/svg_animation/index.html',
-    'project3': '/contents/player/index.html',
-    'project4': '/contents/오목/index.html',
-    'project5': '/contents/카드게임(Solitaire)/index.html',
-    // 여기에 더 많은 프로젝트 URL을 추가할 수 있습니다
-  };
+  
+  if (!projects) {
+    console.warn('Projects prop is null or undefined');
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          데이터 없음
+        </h2>
+        <p className="text-gray-600">
+          프로젝트 데이터가 전달되지 않았습니다.
+        </p>
+      </div>
+    );
+  }
+
+  // results가 없으면 빈 배열로 처리
+  const projectResults = projects.results || [];
+  
+  if (!Array.isArray(projectResults)) {
+    console.warn('Projects.results is not an array:', projectResults);
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          데이터 형식 오류
+        </h2>
+        <p className="text-gray-600">
+          프로젝트 데이터 형식이 올바르지 않습니다.
+        </p>
+        <details className="mt-4 text-sm">
+          <summary>데이터 구조</summary>
+          <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto">
+            {JSON.stringify(projects, null, 2)}
+          </pre>
+        </details>
+      </div>
+    );
+  }
 
   const handleProjectClick = (projectId) => {
     setCurrentProjectId(projectId);
-    setShowIframe(true);
+    setShowContent(true);
   };
 
   const handleClose = () => {
-    setShowIframe(false);
+    setShowContent(false);
     setCurrentProjectId('');
   };
 
@@ -31,13 +59,13 @@ export default function ProjectContent({ projects }) {
     <>
       <div className="flex flex-col items-center justify-center min-h-screen xp-5 mb-10">
         <h2 className="ml-6 text-4xl font-bold sm:text-6ml">
-          총 프로젝트 : {projects.results.length}
+          총 프로젝트 : {projectResults.length}
         </h2>
         <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full">
-          {projects.results.map((aProject, i) => (
+          {projectResults.map((aProject, i) => (
             <div
               key={aProject.id}
-              onClick={() => handleProjectClick(i+1)}  // 프로젝트 ID 전달
+              onClick={() => handleProjectClick(i+1)}
               style={{cursor: 'pointer'}}
             >
               <ProjectItem data={aProject} />
@@ -45,10 +73,10 @@ export default function ProjectContent({ projects }) {
           ))}
         </div>
       </div>
-      <IframeContainer 
-        show={showIframe} 
+      <CustomContentContainer 
+        show={showContent} 
         onClose={handleClose}
-        src={projectUrls[`project${currentProjectId}`] || '/contents/canvas/index.html'}  // 기본값 설정
+        projectId={currentProjectId}
       />
     </>
   );

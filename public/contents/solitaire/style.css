@@ -1,6 +1,7 @@
 @charset "utf-8";
 
-:root {
+/* CSS 변수 범위 제한으로 메인 앱과 충돌 방지 */
+.solitaire-game {
   --cardW: 130px;
 }
 
@@ -11,22 +12,22 @@
   box-sizing: border-box;
 }
 
-body {
+em {
+  font-style: normal;
+}
+
+#wrap {
   padding-top: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background-color: cadetblue;
+  font-family: auto;
   overflow: hidden;
 }
 
-em {
-  font-style: normal;
-}
-
 main {
-  /* padding: 30px 0 0 30px; */
   width: fit-content;
   height: 100%;
 }

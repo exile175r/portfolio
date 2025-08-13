@@ -5,10 +5,10 @@
 }
 
 * {margin: 0;padding: 0;box-sizing: border-box;}
-body {
+#wrap {
   height: 100vh;
   background-color: #007FBA;
-  background-image: url(./img/bg_line.svg);
+  background-image: url(/contents/svg_animation/img/bg_line.svg);
   background-position: -30px -30px;
   background-repeat: repeat;
   overflow: hidden;
