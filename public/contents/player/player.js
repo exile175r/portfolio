@@ -345,10 +345,10 @@ const fileDrop = function(e){
 }
 
 // 이벤트 리스너 등록 (on 이벤트로 간단하게)
-root.ondragover = fileDrop;
-root.ondragenter = fileDrop;
-root.ondragleave = fileDrop;
-root.ondrop = fileDrop;
+root.addEventListener('dragover', fileDrop);
+root.addEventListener('dragenter', fileDrop);
+root.addEventListener('dragleave', fileDrop);
+root.addEventListener('drop', fileDrop);
 
 // 접근성: aria-label 추가
 $playBtn.setAttribute('aria-label', '재생/일시정지');
