@@ -37,29 +37,20 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       // 기존 리소스 정리
       this.cleanup();
       
-      console.log('Loading content with:', { html: html.substring(0, 200) + '...', css, js });
-      
       // HTML에서 body 태그 내용 추출 (정규식 사용)
       const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
       let bodyContent = '';
       
       if (bodyMatch && bodyMatch[1]) {
         bodyContent = bodyMatch[1];
-        console.log('Body content extracted:', {
-          contentLength: bodyContent.length,
-          contentPreview: bodyContent.substring(0, 200) + '...'
-        });
       } else {
         // body 태그가 없으면 전체 HTML 사용
         bodyContent = html;
-        console.log('No body tag found, using full HTML');
       }
       
       // 비디오 요소를 Blob으로 변환하는 로직 추가 (Player 프로젝트 강제 실행)
       if (this.currentProjectPath.includes('/player')) {
-        console.log('Player project detected, forcing video Blob conversion...');
         bodyContent = await this.convertVideoToBlob(bodyContent);
-        console.log('Video Blob conversion completed');
       }
       
       // head에서 CSS와 JS 추출 (정규식 사용)
@@ -102,21 +93,11 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         });
       }
       
-      console.log('Extracted resources:', {
-        headLinks: headLinks.length,
-        headScripts: headScripts.length
-      });
-      
       // 중복 제거: HTML에서 추출된 리소스와 프로젝트별 리소스 병합
       const allCss = this.mergeResources(headLinks, css, 'href');
       const allJs = this.mergeResources(headScripts, js, 'src');
       
-      console.log('Starting resource loading:', {
-        totalCss: allCss.length,
-        totalJs: allJs.length
-      });
-      
-        // CSS를 먼저 로드
+      // CSS를 먼저 로드
         console.log('Step 1: Loading CSS files...');
         const cssResults = await this.loadAllCSS(allCss);
         
@@ -147,48 +128,26 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         }
         
         // CSS 변수 격리 실행
-        console.log('Step 1.6: Isolating CSS variables...');
         this.isolateCSSVariables();
         
         // HTML 컨텐츠를 먼저 삽입
-        console.log('Step 2: Inserting body content...');
-       const contentDiv = this.shadowRoot.querySelector('#content');
-       if (contentDiv) {
-         if (bodyContent && bodyContent.trim().length > 0) {
-           console.log('Inserting content into shadow DOM...');
-           
-           // CSS 변수 격리를 위해 content-scope 클래스 추가
-           const wrappedContent = `<div class="content-scope">${bodyContent}</div>`;
-           contentDiv.innerHTML = wrappedContent;
-           console.log('Content inserted successfully:', {
-             contentLength: bodyContent.length,
-             contentPreview: bodyContent.substring(0, 200) + '...',
-             shadowDOMContent: contentDiv.innerHTML.substring(0, 200) + '...'
-           });
-           
-           // 삽입된 컨텐츠 확인
-           const insertedElements = contentDiv.children;
-           console.log('Inserted elements:', {
-             count: insertedElements.length,
-             elements: Array.from(insertedElements).map(el => ({
-               tagName: el.tagName,
-               id: el.id,
-               className: el.className
-             }))
-           });
-         } else {
-           console.error('No content to insert');
-         }
-       } else {
-         console.error('Content div not found in shadow DOM');
-       }
+        const contentDiv = this.shadowRoot.querySelector('#content');
+        if (contentDiv) {
+          if (bodyContent && bodyContent.trim().length > 0) {
+            // CSS 변수 격리를 위해 content-scope 클래스 추가
+            const wrappedContent = `<div class="content-scope">${bodyContent}</div>`;
+            contentDiv.innerHTML = wrappedContent;
+          } else {
+            console.error('No content to insert');
+          }
+        } else {
+          console.error('Content div not found in shadow DOM');
+        }
        
-               // HTML 삽입 완료 후 DOM이 준비될 때까지 대기 (강화된 검증)
-        console.log('Step 3: Waiting for DOM to be ready...');
+        // HTML 삽입 완료 후 DOM이 준비될 때까지 대기
         await new Promise((resolve, reject) => {
           // 타임아웃 설정 (20초)
           const timeout = setTimeout(() => {
-            console.warn('DOM ready timeout reached, proceeding anyway');
             resolve();
           }, 20000);
           
@@ -269,18 +228,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         });
         
         // JS 로드 & 실행
-        console.log('Step 4: Loading JS files...');
         const jsResults = await this.loadAllJS(allJs);
-       
-       console.log('Resource loading completed:', {
-         cssLoaded: cssResults.length,
-         jsLoaded: jsResults.length
-       });
-      
-      console.log('All resources loaded successfully:', {
-        css: cssResults.length,
-        js: jsResults.length
-      });
       
          } catch (error) {
        console.error('Error loading content:', error);
@@ -293,12 +241,9 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
   }
 
   async loadAllCSS(cssList) {
-    console.log('Starting CSS loading for', cssList.length, 'files');
-    
     // Font Awesome CSS 자동 추가 (Player 프로젝트인 경우)
     if (this.currentProjectPath === '/contents/player') {
       cssList.unshift('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
-      console.log('Font Awesome CSS added for Player project');
       
       // Font Awesome 폰트 파일들도 직접 로딩
       const fontFiles = [
@@ -312,9 +257,8 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           const fontFace = new FontFace('Font Awesome 6 Free', `url(${fontUrl})`);
           await fontFace.load();
           document.fonts.add(fontFace);
-          console.log(`Font loaded: ${fontUrl}`);
         } catch (error) {
-          console.warn(`Failed to load font: ${fontUrl}`, error);
+          // 폰트 로딩 실패 시 무시하고 진행
         }
       }
     }
@@ -322,11 +266,8 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
     const cssPromises = cssList.map(async (cssPath, index) => {
       const href = typeof cssPath === 'string' ? cssPath : cssPath.href;
       if (!href) {
-        console.warn('Invalid CSS path at index', index, cssPath);
         return null;
       }
-      
-      console.log(`Loading CSS ${index + 1}/${cssList.length}:`, href);
       
       try {
         return await new Promise((resolve, reject) => {
@@ -337,14 +278,12 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           
           // 타임아웃 설정 (5초)
           const timeout = setTimeout(() => {
-            console.warn(`CSS loading timeout: ${href}`);
             resolve(null);
           }, 5000);
           
           link.onload = () => {
             clearTimeout(timeout);
             this.stylesheets.push(link);
-            console.log(`CSS loaded successfully: ${href}`);
             
             // Font Awesome CSS인 경우 폰트 경로 수정
             if (href.includes('font-awesome') && href.includes('all.min.css')) {
@@ -356,7 +295,6 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           
           link.onerror = () => {
             clearTimeout(timeout);
-            console.warn(`Failed to load CSS: ${href}`);
             resolve(null);
           };
           
@@ -384,8 +322,6 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
   }
 
     async loadAllJS(jsList) {
-    console.log('Starting bundled JS loading for', jsList.length, 'files');
-    
     try {
       // 모든 JS 파일을 순서대로 가져와서 하나로 합치기
       const jsCodeParts = [];
@@ -395,38 +331,31 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         const src = typeof jsPath === 'string' ? jsPath : jsPath.src;
         
         if (!src) {
-          console.warn(`Invalid JS path at index ${i}:`, jsPath);
           continue;
         }
-        
-        console.log(`Fetching JS ${i + 1}/${jsList.length}: ${src}`);
         
         try {
           const response = await fetch(src);
           if (!response.ok) {
-            console.warn(`Failed to fetch JS: ${src}`);
             continue;
           }
           
           const jsCode = await response.text();
-          console.log(`JS code fetched for: ${src}`, jsCode.substring(0, 100) + '...');
           
           // 각 JS 파일을 주석과 함께 구분하여 추가
           jsCodeParts.push(`\n// ===== ${src} =====\n${jsCode}\n`);
           
         } catch (error) {
-          console.warn(`Error loading JS ${src}:`, error);
+          // JS 로딩 실패 시 무시하고 진행
         }
       }
       
       if (jsCodeParts.length === 0) {
-        console.warn('No JS files loaded successfully');
         return [];
       }
       
       // 모든 JS 코드를 하나로 합치기
       const combinedJsCode = jsCodeParts.join('\n');
-      console.log('Combined JS code length:', combinedJsCode.length);
       
       // 전역 변수로 shadow DOM 컨텍스트 설정
       window.__shadowRoot__ = this.shadowRoot;
@@ -436,7 +365,6 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       window.$$ = (selector) => window.__shadowRoot__.querySelectorAll(selector);
       
              // 합쳐진 JS 코드를 한 번에 실행 (에러 발생 시 재시도)
-       console.log('Executing combined JS code...');
        
        let executionSuccess = false;
        let retryCount = 0;
@@ -444,8 +372,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
        
                while (!executionSuccess && retryCount < maxRetries) {
           try {
-            // JS 실행 전 DOM 요소 재검증 (강화)
-            console.log(`Validating DOM before JS execution (attempt ${retryCount + 1})...`);
+            // JS 실행 전 DOM 요소 재검증
             const contentDiv = this.shadowRoot.querySelector('#content');
             if (!contentDiv) {
               throw new Error('Content div not found');
@@ -457,10 +384,8 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
               if (!testQuery || testQuery.length === 0) {
                 throw new Error('querySelectorAll test failed');
               }
-              console.log(`DOM query test passed: ${testQuery.length} elements found`);
             } catch (queryError) {
-              console.warn('DOM query test failed, DOM not ready yet:', queryError);
-              await new Promise(resolve => setTimeout(resolve, 1500)); // 1000ms → 1500ms로 증가
+              await new Promise(resolve => setTimeout(resolve, 1500));
               continue;
             }
             
@@ -501,27 +426,21 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
                if (finalTest.length !== projectRequiredElements.length) {
                  throw new Error(`Final test failed: expected ${projectRequiredElements.length}, got ${finalTest.length}`);
                }
-               console.log('Final DOM validation passed, all elements accessible');
              } catch (finalError) {
-               console.warn('Final validation failed:', finalError);
                await new Promise(resolve => setTimeout(resolve, 1500));
                continue;
              }
             
-            console.log('DOM validation passed, executing JS...');
+            // JS 실행
             eval(combinedJsCode);
             executionSuccess = true;
-            console.log('All JS executed successfully as bundle');
           } catch (error) {
             retryCount++;
-            console.warn(`JS execution failed (attempt ${retryCount}/${maxRetries}):`, error);
             
             if (retryCount < maxRetries) {
               // DOM이 더 준비될 때까지 대기 후 재시도
-              console.log(`Waiting before retry ${retryCount + 1}...`);
-              await new Promise(resolve => setTimeout(resolve, 1500)); // 1000ms → 1500ms로 증가
+              await new Promise(resolve => setTimeout(resolve, 1500));
             } else {
-              console.error('All JS execution attempts failed');
               throw error;
             }
           }
@@ -561,7 +480,6 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
     if (this.videoBlobURLs) {
       this.videoBlobURLs.forEach(blobURL => {
         URL.revokeObjectURL(blobURL);
-        console.log('Blob URL revoked:', blobURL);
       });
       this.videoBlobURLs = [];
     }
@@ -668,20 +586,17 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
                  // 기존 규칙 제거하고 새 규칙 추가
                  sheet.sheet.deleteRule(i);
                  sheet.sheet.insertRule(newRule, i);
-                 console.log('CSS variable isolated:', rule.selectorText, '→', newSelector);
                }
              }
            } else if (sheet.href && !sheet.href.startsWith(window.location.origin)) {
-             // 외부 스타일시트는 로그만 남기고 건너뛰기
-             console.log('Skipping external stylesheet for CSS variable isolation:', sheet.href);
+             // 외부 스타일시트는 건너뛰기
            }
          } catch (sheetError) {
            // 개별 스타일시트 오류는 무시하고 계속 진행
-           console.log('Skipping stylesheet due to CORS policy:', sheet.href);
          }
        }
      } catch (error) {
-       console.warn('CSS variable isolation completed with warnings:', error);
+       // CSS 변수 격리 중 오류 발생 시 무시하고 진행
      }
    }
 
@@ -706,22 +621,18 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
                        // 상대 경로를 절대 경로로 변환
                        const absoluteSrc = src.replace(/webfonts\//g, 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/');
                        rule.style.setProperty('src', absoluteSrc);
-                       console.log('Fixed font path:', src, '→', absoluteSrc);
                      }
                    }
                  }
                }
-             } else {
-               console.log('Skipping Font Awesome path fix due to CORS policy:', sheet.href);
              }
            }
          } catch (sheetError) {
            // 개별 스타일시트 오류는 무시하고 계속 진행
-           console.log('Skipping Font Awesome stylesheet due to CORS policy:', sheet.href);
          }
        }
      } catch (error) {
-       console.warn('Font Awesome path fixing completed with warnings:', error);
+       // Font Awesome 경로 수정 중 오류 발생 시 무시하고 진행
      }
    }
 
@@ -747,36 +658,22 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
    
         async convertVideoToBlob(htmlContent) {
      try {
-       console.log('=== VIDEO BLOB CONVERSION START ===');
-       console.log('HTML content length:', htmlContent.length);
-       console.log('HTML preview:', htmlContent.substring(0, 500) + '...');
+             // 비디오 Blob 변환 시작
        
        // 비디오 파일 경로 추출
        const videoMatch = htmlContent.match(/<video[^>]*src=["']([^"']+)["'][^>]*>/i);
        if (!videoMatch) {
-         console.log('❌ No video element found in HTML');
-         console.log('HTML content:', htmlContent);
          return htmlContent;
        }
       
       const videoSrc = videoMatch[1];
-      console.log('Found video src:', videoSrc);
-      
-      // 파일명 추출 및 로깅
+      // 파일명 추출
       const fileName = videoSrc.split('/').pop();
-      console.log('Video filename:', fileName);
       
       // 절대 경로로 변환 (환경 감지)
       let absoluteVideoPath = videoSrc;
       if (!videoSrc.startsWith('http') && !videoSrc.startsWith('//')) {
-        // 현재 실행 환경 확인 (강화된 감지)
-        console.log('🔍 Environment detection:', {
-          href: window.location.href,
-          origin: window.location.origin,
-          hostname: window.location.hostname,
-          port: window.location.port,
-          protocol: window.location.protocol
-        });
+        // 현재 실행 환경 확인
         
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         const isLocalNetwork = window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('172.');
@@ -791,7 +688,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           } else {
             absoluteVideoPath = `${localOrigin}${this.currentProjectPath}/${videoSrc}`;
           }
-          console.log('🌐 Local environment detected, using:', localOrigin);
+          // 로컬 환경 감지됨
         } else {
           // 배포 환경: 현재 origin 사용
           if (videoSrc.startsWith('/')) {
@@ -799,110 +696,57 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           } else {
             absoluteVideoPath = `${window.location.origin}${this.currentProjectPath}/${videoSrc}`;
           }
-          console.log('🚀 Production environment detected, using:', window.location.origin);
         }
-        
-        // 경로 검증 로깅
-        console.log('🔍 Path construction details:', {
-          originalVideoSrc: videoSrc,
-          startsWithSlash: videoSrc.startsWith('/'),
-          currentProjectPath: this.currentProjectPath,
-          constructedPath: absoluteVideoPath
-        });
       }
       
-      console.log('Absolute video path:', absoluteVideoPath);
-      
-      // 먼저 HEAD 요청으로 파일 존재 여부 확인
-      try {
-        const headResponse = await fetch(absoluteVideoPath, { method: 'HEAD' });
-        console.log('🔍 HEAD request result:', {
-          status: headResponse.status,
-          statusText: headResponse.statusText,
-          contentLength: headResponse.headers.get('content-length'),
-          contentType: headResponse.headers.get('content-type')
-        });
-        
-        if (!headResponse.ok) {
-          console.warn('⚠️ HEAD request failed, but proceeding with GET request');
-        }
-      } catch (headError) {
-        console.warn('⚠️ HEAD request failed:', headError.message);
-      }
+      // 절대 경로 설정 완료
       
       // 비디오 파일을 fetch로 가져와서 Blob 생성
-      console.log('🔍 Fetching video from:', absoluteVideoPath);
       
-      const response = await fetch(absoluteVideoPath);
-      console.log('📡 Fetch response status:', response.status, response.statusText);
-      console.log('📡 Fetch response headers:', Object.fromEntries(response.headers.entries()));
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
-      }
-      
-      const videoBlob = await response.blob();
-      console.log('📦 Blob created:', {
-        size: videoBlob.size,
-        type: videoBlob.type,
-        lastModified: videoBlob.lastModified
-      });
-      
-      // 파일 크기 검증
-      const fileSizeMB = (videoBlob.size / 1024 / 1024).toFixed(2);
-      console.log('Video file size:', fileSizeMB, 'MB');
-      
-      if (videoBlob.size === 0) {
-        throw new Error('Video file is empty (0 bytes) - fetch failed or file not found');
-      }
-      
-      if (parseFloat(fileSizeMB) < 0.01) {
-        console.warn('⚠️ Video file is very small:', fileSizeMB, 'MB - might be corrupted');
+              const response = await fetch(absoluteVideoPath);
         
-        // 추가 디버깅: 응답 내용 확인
-        if (videoBlob.size < 1000) { // 1KB 미만인 경우
-          const textContent = await videoBlob.text();
-          console.error('🔍 Small blob content preview:', textContent.substring(0, 200));
-          
-          if (textContent.includes('<!DOCTYPE') || textContent.includes('<html')) {
-            throw new Error('Video file returned HTML instead of video content - likely a 404 or redirect page');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
+        }
+        
+        const videoBlob = await response.blob();
+      
+              // 파일 크기 검증
+        const fileSizeMB = (videoBlob.size / 1024 / 1024).toFixed(2);
+        
+        if (videoBlob.size === 0) {
+          throw new Error('Video file is empty (0 bytes) - fetch failed or file not found');
+        }
+        
+        if (parseFloat(fileSizeMB) < 0.01) {
+          // 작은 파일 크기 경고
+          if (videoBlob.size < 1000) { // 1KB 미만인 경우
+            const textContent = await videoBlob.text();
+            
+            if (textContent.includes('<!DOCTYPE') || textContent.includes('<html')) {
+              throw new Error('Video file returned HTML instead of video content - likely a 404 or redirect page');
+            }
           }
         }
-      }
       
-      const blobURL = URL.createObjectURL(videoBlob);
-      console.log('Video converted to Blob URL:', blobURL);
-      
-      // HTML에서 비디오 src를 Blob URL로 교체
-      const updatedHtml = htmlContent.replace(
-        /(<video[^>]*src=["'])[^"']+(["'][^>]*>)/i,
-        `$1${blobURL}$2`
-      );
-      
-      // Blob URL을 정리할 수 있도록 저장
-      this.videoBlobURLs = this.videoBlobURLs || [];
-      this.videoBlobURLs.push(blobURL);
-      
-      console.log('HTML updated with Blob URL');
-      return updatedHtml;
+              const blobURL = URL.createObjectURL(videoBlob);
+        
+        // HTML에서 비디오 src를 Blob URL로 교체
+        const updatedHtml = htmlContent.replace(
+          /(<video[^>]*src=["'])[^"']+(["'][^>]*>)/i,
+          `$1${blobURL}$2`
+        );
+        
+        // Blob URL을 정리할 수 있도록 저장
+        this.videoBlobURLs = this.videoBlobURLs || [];
+        this.videoBlobURLs.push(blobURL);
+        
+        return updatedHtml;
       
          } catch (error) {
-       console.error('❌ Error converting video to Blob:', error);
-       console.error('Error details:', {
-         name: error.name,
-         message: error.message,
-         stack: error.stack
-       });
+       console.error('Error converting video to Blob:', error);
        
-       // 추가 디버깅 정보
-       console.error('🔍 Debug info:', {
-         absoluteVideoPath,
-         currentOrigin: window.location.origin,
-         currentProjectPath: this.currentProjectPath,
-         videoSrc: videoMatch ? videoMatch[1] : 'No match found'
-       });
-       
-       console.log('🔄 Falling back to original HTML');
+       // 에러 발생 시 원본 HTML 반환
        return htmlContent;
      }
    }
