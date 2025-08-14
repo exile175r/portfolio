@@ -801,17 +801,52 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           }
           console.log('🚀 Production environment detected, using:', window.location.origin);
         }
+        
+        // 경로 검증 로깅
+        console.log('🔍 Path construction details:', {
+          originalVideoSrc: videoSrc,
+          startsWithSlash: videoSrc.startsWith('/'),
+          currentProjectPath: this.currentProjectPath,
+          constructedPath: absoluteVideoPath
+        });
       }
       
       console.log('Absolute video path:', absoluteVideoPath);
       
+      // 먼저 HEAD 요청으로 파일 존재 여부 확인
+      try {
+        const headResponse = await fetch(absoluteVideoPath, { method: 'HEAD' });
+        console.log('🔍 HEAD request result:', {
+          status: headResponse.status,
+          statusText: headResponse.statusText,
+          contentLength: headResponse.headers.get('content-length'),
+          contentType: headResponse.headers.get('content-type')
+        });
+        
+        if (!headResponse.ok) {
+          console.warn('⚠️ HEAD request failed, but proceeding with GET request');
+        }
+      } catch (headError) {
+        console.warn('⚠️ HEAD request failed:', headError.message);
+      }
+      
       // 비디오 파일을 fetch로 가져와서 Blob 생성
+      console.log('🔍 Fetching video from:', absoluteVideoPath);
+      
       const response = await fetch(absoluteVideoPath);
+      console.log('📡 Fetch response status:', response.status, response.statusText);
+      console.log('📡 Fetch response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
         throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
       }
       
       const videoBlob = await response.blob();
+      console.log('📦 Blob created:', {
+        size: videoBlob.size,
+        type: videoBlob.type,
+        lastModified: videoBlob.lastModified
+      });
       
       // 파일 크기 검증
       const fileSizeMB = (videoBlob.size / 1024 / 1024).toFixed(2);
@@ -848,6 +883,15 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
          message: error.message,
          stack: error.stack
        });
+       
+       // 추가 디버깅 정보
+       console.error('🔍 Debug info:', {
+         absoluteVideoPath,
+         currentOrigin: window.location.origin,
+         currentProjectPath: this.currentProjectPath,
+         videoSrc: videoMatch ? videoMatch[1] : 'No match found'
+       });
+       
        console.log('🔄 Falling back to original HTML');
        return htmlContent;
      }
