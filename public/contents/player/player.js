@@ -18,36 +18,6 @@ let player = { paused: true };
 
 // 페이지 로드 완료 후 영상 상태 확인
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, checking video element...');
-  console.log('Video element:', media);
-  console.log('Initial video src:', media.src);
-  console.log('Video readyState:', media.readyState);
-  console.log('Video networkState:', media.networkState);
-  console.log('Current location analysis:', {
-    href: window.location.href,
-    pathname: window.location.pathname,
-    expectedVideoPath: '/contents/player/video/sample.mp4'
-  });
-  
-  // 영상 로드 상태 모니터링
-  const checkVideoStatus = () => {
-    console.log('Video status check:');
-    console.log('- src:', media.src);
-    console.log('- readyState:', media.readyState);
-    console.log('- networkState:', media.networkState);
-    console.log('- error:', media.error);
-    console.log('- duration:', media.duration);
-  };
-  
-  // 1초 후 상태 확인
-  setTimeout(checkVideoStatus, 1000);
-  
-  // 3초 후 상태 확인
-  // setTimeout(checkVideoStatus, 3000);
-  
-  // 비디오 로드 확인
-  console.log('Video loading check completed');
-  
   // 비디오 경로 자동 수정
   PathManager.fixVideoPath();
 });
@@ -59,23 +29,14 @@ const PathManager = {
     return media.src || '/contents/player/video/sample.mp4';
   },
   
-  // 비디오 로드 상태 확인
-  checkVideoLoad: () => {
-    console.log('Current video path:', media.src);
-    console.log('Video ready state:', media.readyState);
-    console.log('Video network state:', media.networkState);
-  },
-  
   // 비디오 경로 자동 수정
   fixVideoPath: () => {
     const currentSrc = media.src;
-    console.log('Current video src:', currentSrc);
     
     // 잘못된 경로를 올바른 절대 경로로 수정
     if (currentSrc && !currentSrc.includes('/contents/player/video/')) {
       const baseUrl = window.location.origin;
       const newSrc = `${baseUrl}/contents/player/video/sample.mp4`;
-      console.log('Fixing video path from', currentSrc, 'to', newSrc);
       media.src = newSrc;
     }
   }
@@ -83,31 +44,16 @@ const PathManager = {
 
 // 영상 로드 에러 처리 추가
 media.addEventListener('error', function(e) {
-  console.error('Video loading error:', e);
-  console.log('Current video src:', media.src);
-  console.log('Error details:', {
-    error: media.error,
-    networkState: media.networkState,
-    readyState: media.readyState,
-    currentSrc: media.currentSrc
-  });
-  
   // 에러 처리 및 경로 수정 시도
   if (media.error) {
-    console.log(`MediaError Code: ${media.error.code}, Message: ${media.error.message}`);
-    
     // 경로 문제인 경우 자동 수정 시도
     if (media.error.code === 4) { // MEDIA_ERR_SRC_NOT_SUPPORTED
-      console.log('Attempting to fix video path...');
       PathManager.fixVideoPath();
       
-      // 수정된 경로로 다시 로드 시도 (더 긴 대기 시간)
+      // 수정된 경로로 다시 로드 시도
       setTimeout(() => {
         if (media.error) {
-          console.log('Path fix failed, showing error message');
           showVideoError();
-        } else {
-          console.log('Path fix successful, video should load now');
         }
       }, 2000);
     } else {
@@ -135,22 +81,10 @@ function showVideoError() {
 
 // 영상 로드 성공 시 처리
 media.addEventListener('loadeddata', function() {
-  console.log('Video loaded successfully from:', media.src);
   // 영상 정보 업데이트
   if (media.duration && isFinite(media.duration)) {
     $totalTime.textContent = player.duration();
   }
-});
-
-// 영상 로드 시작 시 처리
-media.addEventListener('loadstart', function() {
-  console.log('Video loading started from:', media.src);
-  console.log('Current location:', window.location.href);
-});
-
-// 영상 로드 완료 시 처리
-media.addEventListener('canplay', function() {
-  console.log('Video can play from:', media.src);
 });
 
 const updatePlayPauseIcon = (isPlaying) => {
@@ -167,13 +101,20 @@ function Player() {
   const $this = this;
   let playTimer;
   $this.currentTime = 0;
+  
   $this.play = function () {
     updatePlayPauseIcon(true);
     media.play();
     $this.currentTime = media.currentTime; // 동기화
+    
+    // 이전 타이머 정리
+    if (playTimer) {
+      clearInterval(playTimer);
+    }
+    
+    // 새로운 타이머 시작
     playTimer = setInterval(function () {
-      // $this.currentTime = media.currentTime; // 항상 동기화
-      $this.currentTime += .5;
+      $this.currentTime = media.currentTime; // 실제 시간과 동기화
       if($this.currentTime >= media.duration) {
         $this.currentTime = 0;
         $this.pause();
@@ -181,15 +122,23 @@ function Player() {
       }
       if($this.ontimeupdate) $this.ontimeupdate();
     }, 500);
+    
     $this.paused = false;
   };
+  
   $this.pause = function () {
     updatePlayPauseIcon(false);
     media.pause();
-    clearInterval(playTimer);
-    if($this.ontimeupdate) $this.ontimeupdate();
+    
+    // 타이머만 정리 (timeupdate는 유지)
+    if (playTimer) {
+      clearInterval(playTimer);
+      playTimer = null;
+    }
+    
     $this.paused = true;
   };
+  
   $this.duration = function () {
     let dur = media.duration;
     if(isNaN(dur) || !isFinite(dur) || dur <= 0) return '00:00:00';
@@ -205,23 +154,7 @@ function Player() {
 
 player = new Player();
 
-// const waitForDuration = (callback, interval = 100, maxTry = 50) => {
-//   let tryCount = 0;
-//   const timer = setInterval(() => {
-//     if (!isNaN(media.duration) && isFinite(media.duration) && media.duration > 0) {
-//       clearInterval(timer);
-//       callback(media.duration);
-//     } else if (++tryCount > maxTry) {
-//       clearInterval(timer);
-//       callback(0); // 실패 시 0 반환
-//     }
-//   }, interval);
-// }
 
-// // 사용 예시
-// waitForDuration(() => {
-//   $totalTime.textContent = player.duration();
-// });
 
 let maxduration, percentage;
 let hr, min, sec, playTime = 0;
@@ -248,7 +181,9 @@ const timeupdate = () => {
 }
 
 const play_pause = ({ target }) => {
+  // timeupdate 함수는 한 번만 등록
   if(!player.ontimeupdate) player.ontimeupdate = timeupdate;
+  
   if(media.paused) {
     player.play();
     updatePlayPauseIcon(true);
@@ -256,10 +191,10 @@ const play_pause = ({ target }) => {
     player.pause();
     updatePlayPauseIcon(false);
   }
+  
   if(target.id == 'video') {
     $screen.className = '';
     setTimeout(() => $screen.className = 'on', 0);
-    // $screen.className = 'on';
   }
 }
 
@@ -269,9 +204,13 @@ media.onclick = play_pause;
 $("#stop").onclick = () => {
   media.currentTime = 0;
   player.pause();
+  
+  // stop 시에는 timeupdate를 한 번만 실행하여 UI 업데이트
   timeupdate();
-  if(!media.paused) $playBtn.textContent = 'play';
+  
+  // 프로그레스바와 시간 표시 초기화
   $progressBar.value = 0;
+  $current.textContent = '00:00:00';
 };
 
 const $min = Math.min;
@@ -326,7 +265,6 @@ $volume.onpointerup = ({ target }) => {
 
 $muteBtn.onclick = () => {
   isMute = !isMute;
-  // console.log(volume);
   if(isMute) {
     $muteIcon.className = 'fas fa-volume-mute';
     $volume.value = 0;
@@ -371,19 +309,35 @@ const fileDrop = function(e){
         alert('비디오 파일만 업로드할 수 있습니다.');
         return;
       }
-      console.log('Dropped file:', file.name, 'Type:', file.type, 'Size:', file.size);
+      
+      // 이전 비디오 정리
+      if (media.src && media.src.startsWith('blob:')) {
+        URL.revokeObjectURL(media.src);
+      }
+      
+      // 플레이어 상태 초기화
+      player.pause();
+      player.currentTime = 0;
+      
       const url = URL.createObjectURL(file);
-      console.log('Created blob URL:', url);
       media.src = url;
       media.load();
+      
       media.onloadedmetadata = () => {
-        console.log('Video metadata loaded successfully');
+        // 상태 초기화
         media.currentTime = 0;
         player.currentTime = 0;
         $totalTime.textContent = player.duration();
         updatePlayPauseIcon(false);
+        
+        // 프로그레스바 초기화
+        $progressBar.value = 0;
+        $current.textContent = '00:00:00';
+        
+        // timeupdate는 한 번만 실행
         timeupdate();
       };
+      
       media.onerror = (error) => {
         console.error('Error loading dropped video:', error);
         alert('영상 파일을 로드하는 중 오류가 발생했습니다.');
@@ -391,10 +345,15 @@ const fileDrop = function(e){
     break;
   }
 }
-root.addEventListener('dragover', fileDrop);
-root.addEventListener('dragenter', fileDrop);
-root.addEventListener('dragleave', fileDrop);
-root.addEventListener('drop', fileDrop);
+
+// 이벤트 리스너 등록 (속성으로 중복 방지)
+if (!root.hasAttribute('data-drop-events-registered')) {
+  root.addEventListener('dragover', fileDrop);
+  root.addEventListener('dragenter', fileDrop);
+  root.addEventListener('dragleave', fileDrop);
+  root.addEventListener('drop', fileDrop);
+  root.setAttribute('data-drop-events-registered', 'true');
+}
 
 // 접근성: aria-label 추가
 $playBtn.setAttribute('aria-label', '재생/일시정지');
