@@ -106,11 +106,9 @@ function Player() {
     updatePlayPauseIcon(true);
     media.play();
     $this.currentTime = media.currentTime; // 동기화
-    
+
     // 이전 타이머 정리
-    if (playTimer) {
-      clearInterval(playTimer);
-    }
+    if(playTimer) clearInterval(playTimer);
     
     // 새로운 타이머 시작
     playTimer = setInterval(function () {
@@ -154,8 +152,6 @@ function Player() {
 
 player = new Player();
 
-
-
 let maxduration, percentage;
 let hr, min, sec, playTime = 0;
 const timeupdate = () => {
@@ -177,6 +173,8 @@ const timeupdate = () => {
     media.currentTime = 0;
     player.pause();
     updatePlayPauseIcon(false);
+    $progressBar.value = 0;
+    playTime = 0;
   }
 }
 
