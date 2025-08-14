@@ -104,25 +104,8 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
         // CSS 로딩 완료 후 추가 대기 (폰트 로딩을 위해)
         console.log('Step 1.5: Waiting for CSS and fonts to be applied...');
         if (this.currentProjectPath === '/contents/player') {
-          // Player 프로젝트는 폰트 로딩을 위해 더 오래 대기
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          console.log('Font Awesome fonts should be ready now');
-          
-          // 폰트 로딩 상태 확인 (간소화)
-          try {
-            const testElement = document.createElement('i');
-            testElement.className = 'fas fa-play';
-            this.shadowRoot.appendChild(testElement);
-            
-            // 간단한 폰트 확인
-            const computedStyle = window.getComputedStyle(testElement);
-            console.log('Font loading check completed');
-            
-            // 테스트 요소 제거
-            this.shadowRoot.removeChild(testElement);
-          } catch (error) {
-            console.warn('Font loading check failed:', error);
-          }
+          // Player 프로젝트는 폰트 로딩 대기 없이 바로 진행
+          console.log('Player project - proceeding immediately');
         } else {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
@@ -170,7 +153,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
               return;
             }
             
-                         // 실제 DOM 접근 테스트 (범용적 검증)
+              // 실제 DOM 접근 테스트 (범용적 검증)
              try {
                // 프로젝트별 필수 요소 정의
                const projectRequiredElements = this.getRequiredElements();
@@ -703,7 +686,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       
       // 비디오 파일을 fetch로 가져와서 Blob 생성
       
-              const response = await fetch(absoluteVideoPath);
+        const response = await fetch(absoluteVideoPath);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch video: ${response.status} ${response.statusText}`);
@@ -729,7 +712,7 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
           }
         }
       
-              const blobURL = URL.createObjectURL(videoBlob);
+        const blobURL = URL.createObjectURL(videoBlob);
         
         // HTML에서 비디오 src를 Blob URL로 교체
         const updatedHtml = htmlContent.replace(
@@ -759,7 +742,8 @@ if (typeof window !== 'undefined' && typeof customElements !== 'undefined' && !c
 }
 
 export default function CustomContentContainer({ show, onClose, projectId }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // 초기값을 true로 변경하여 로딩 화면이 항상 표시되도록 함
+  const [loadingTimeout, setLoadingTimeout] = useState(null);
   const projectElementRef = useRef(null);
 
   // 프로젝트별 리소스 매핑 (더 범용적으로)
@@ -807,39 +791,87 @@ export default function CustomContentContainer({ show, onClose, projectId }) {
     if (!show || !projectId) return;
 
     const loadContent = async () => {
-      setLoading(true);
-      const resources = projectResources[projectId];
+      let timeoutId = null; // 로컬 변수로 관리
       
-      if (!resources) {
-        console.error('Project resources not found');
-        setLoading(false);
-        return;
-      }
-
       try {
+        // 로딩 상태를 즉시 true로 설정하여 로딩 화면 표시
+        setLoading(true);
+        
+        const resources = projectResources[projectId];
+        if (!resources) {
+          throw new Error('프로젝트를 찾을 수 없습니다.');
+        }
+
         // HTML 로드
         const htmlResponse = await fetch(resources.html);
         const htmlContent = await htmlResponse.text();
-        
+
+        // CSS 로드
+        if (resources.css && resources.css.length > 0) {
+          await projectElementRef.current.loadAllCSS(resources.css);
+        }
+
         // 커스텀 태그에 컨텐츠 설정
         if (projectElementRef.current) {
+          // setContent가 완전히 완료될 때까지 기다림
           await projectElementRef.current.setContent(
             htmlContent,
             resources.css,
             resources.js,
-            resources.basePath // 프로젝트별 HTML 경로를 전달
+            resources.basePath
           );
+          
+          // 추가로 DOM이 완전히 준비될 때까지 대기
+          await new Promise(resolve => {
+            const checkReady = () => {
+              const contentDiv = projectElementRef.current.shadowRoot?.querySelector('#content');
+              if (contentDiv && contentDiv.children.length > 0) {
+                // DOM이 준비되었는지 확인
+                const hasContent = contentDiv.querySelectorAll('*').length > 0;
+                if (hasContent) {
+                  resolve();
+                } else {
+                  setTimeout(checkReady, 100);
+                }
+              } else {
+                setTimeout(checkReady, 100);
+              }
+            };
+            checkReady();
+          });
         }
         
+        // 로딩 타이머 정리
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          setLoadingTimeout(null);
+        }
+        
+        // 모든 컨텐츠 로딩이 완료된 후에만 로딩 화면 숨김
         setLoading(false);
+        
       } catch (error) {
         console.error('Error loading content:', error);
+        // 에러 발생 시 로딩 타이머 정리
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          setLoadingTimeout(null);
+        }
         setLoading(false);
       }
     };
 
     loadContent();
   }, [show, projectId]);
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (loadingTimeout) {
+        clearTimeout(loadingTimeout);
+      }
+    };
+  }, [loadingTimeout]);
 
   useEffect(() => {
     if (show) {
@@ -895,16 +927,27 @@ export default function CustomContentContainer({ show, onClose, projectId }) {
       </button>
       
       {loading && (
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          zIndex: 1,
-          color: 'white',
-          fontSize: '18px'
-        }}>
-          Loading...
+        <div 
+          className="loading-container"
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            zIndex: 1,
+            textAlign: 'center',
+            color: 'white'
+          }}
+        >
+          {/* 원형 스피너만 */}
+          <div className="spinner" style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(255, 255, 255, 0.3)',
+            borderTop: '4px solid #fff',
+            borderRadius: '50%',
+            animation: 'spin .5s linear infinite'
+          }}></div>
         </div>
       )}
       
@@ -913,9 +956,19 @@ export default function CustomContentContainer({ show, onClose, projectId }) {
         style={{
           width: '100%',
           height: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          opacity: loading ? 0 : 1,
+          transition: 'opacity 0.3s ease-in'
         }}
       />
+      
+      {/* CSS 애니메이션을 위한 스타일 */}
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }

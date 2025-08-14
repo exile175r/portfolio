@@ -20,13 +20,22 @@ let player = { paused: true };
 document.addEventListener('DOMContentLoaded', function() {
   // 비디오 경로 자동 수정
   PathManager.fixVideoPath();
+  
+  // 주기적으로 duration 확인 (백업 방법)
+  setInterval(() => {
+    if (media.duration && isFinite(media.duration) && media.duration > 0) {
+      if ($totalTime.textContent === '00:00:00') {
+        updateDuration();
+      }
+    }
+  }, 1000); // 1초마다 확인
 });
 
 // 간단한 경로 관리 유틸리티
 const PathManager = {
   // 현재 비디오 경로 확인
   getCurrentVideoPath: () => {
-    return media.src || '/contents/player/video/sample.mp4';
+    return media.src || '/contents/player/video/sample-video.mp4';
   },
   
   // 비디오 경로 자동 수정
@@ -36,7 +45,7 @@ const PathManager = {
     // 잘못된 경로를 올바른 절대 경로로 수정
     if (currentSrc && !currentSrc.includes('/contents/player/video/')) {
       const baseUrl = window.location.origin;
-      const newSrc = `${baseUrl}/contents/player/video/sample.mp4`;
+      const newSrc = `${baseUrl}/contents/player/video/sample-video.mp4`;
       media.src = newSrc;
     }
   }
@@ -82,10 +91,49 @@ function showVideoError() {
 // 영상 로드 성공 시 처리
 media.addEventListener('loadeddata', function() {
   // 영상 정보 업데이트
-  if (media.duration && isFinite(media.duration)) {
-    $totalTime.textContent = player.duration();
-  }
+  updateDuration();
 });
+
+// duration이 변경될 때마다 업데이트
+media.addEventListener('durationchange', function() {
+  updateDuration();
+});
+
+// 메타데이터가 로드될 때도 업데이트
+media.addEventListener('loadedmetadata', function() {
+  updateDuration();
+});
+
+// canplay 이벤트에서도 duration 확인
+media.addEventListener('canplay', function() {
+  updateDuration();
+});
+
+// canplaythrough 이벤트에서도 duration 확인
+media.addEventListener('canplaythrough', function() {
+  updateDuration();
+});
+
+// progress 이벤트에서도 duration 확인
+media.addEventListener('progress', function() {
+  updateDuration();
+});
+
+// timeupdate 이벤트에서도 duration 확인 (재생 중)
+media.addEventListener('timeupdate', function() {
+  updateDuration();
+});
+
+// duration 업데이트 함수
+const updateDuration = () => {
+  // 여러 방법으로 duration을 가져오기 시도
+  let duration = media.duration;
+  // media.duration 직접 확인
+  if (duration && isFinite(duration) && duration > 0) {
+    $totalTime.textContent = player.duration();
+    return;
+  }
+};
 
 const updatePlayPauseIcon = (isPlaying) => {
   if(isPlaying) {
@@ -139,7 +187,20 @@ function Player() {
   
   $this.duration = function () {
     let dur = media.duration;
+    
+    // 여러 방법으로 duration을 가져오기 시도
+    if (dur && isFinite(dur) && dur > 0) {
+      // 정상적인 경우
+    } else if (media.readyState >= 1) {
+      // readyState가 HAVE_METADATA 이상인 경우 강제로 다시 확인
+      dur = media.duration;
+    } else if (media.buffered && media.buffered.length > 0) {
+      // buffered 정보가 있는 경우 end time을 duration으로 사용
+      dur = media.buffered.end(media.buffered.length - 1);
+    }
+    
     if(isNaN(dur) || !isFinite(dur) || dur <= 0) return '00:00:00';
+    
     let hr = parseInt(dur / 3600);
     let min = parseInt((dur % 3600) / 60);
     let sec = parseInt(dur % 60);
@@ -147,6 +208,11 @@ function Player() {
     if(min < 10) min = `0${min}`;
     if(sec < 10) sec = `0${sec}`;
     return `${hr}:${min}:${sec}`;
+  }
+  
+  // duration이 로드되었는지 확인하는 메서드 추가
+  $this.isDurationLoaded = function () {
+    return media.duration && isFinite(media.duration) && media.duration > 0;
   }
 };
 
@@ -166,15 +232,22 @@ const timeupdate = () => {
   $current.textContent = `${hr}:${min}:${sec}`;
 
   maxduration = media.duration;
-  percentage = 100 * playTime / maxduration;
-  $progressBar.value = percentage;
   
-  if(playTime >= maxduration) {
-    media.currentTime = 0;
-    player.pause();
-    updatePlayPauseIcon(false);
+  // duration이 유효한 경우에만 프로그레스바 업데이트
+  if (maxduration && isFinite(maxduration) && maxduration > 0) {
+    percentage = 100 * playTime / maxduration;
+    $progressBar.value = percentage;
+    
+    if(playTime >= maxduration) {
+      media.currentTime = 0;
+      player.pause();
+      updatePlayPauseIcon(false);
+      $progressBar.value = 0;
+      playTime = 0;
+    }
+  } else {
+    // duration이 아직 로드되지 않은 경우 프로그레스바를 0으로 설정
     $progressBar.value = 0;
-    playTime = 0;
   }
 }
 
@@ -399,15 +472,22 @@ document.addEventListener('keydown', (e) => {
       e.preventDefault();
     break;
   }
+  
+  // 안전하게 controlBar 확인 후 스타일 변경
   const $controlBar = $('#controls');
-  $controlBar.style.opacity = 1;
-  delay = setTimeout(() => {
-    $controlBar.style.opacity = null;
-  }, 300)
+  if ($controlBar) {
+    $controlBar.style.opacity = 1;
+    delay = setTimeout(() => {
+      if ($controlBar) {
+        $controlBar.style.opacity = null;
+      }
+    }, 300);
+  }
 });
 
 const $intro = $('#intro');
 const $introClose = $('#introClose');
 $introClose.onclick = () => {
+  if($totalTime.textContent == '') $totalTime.textContent = player.duration();
   $intro.style.display = 'none';
 };

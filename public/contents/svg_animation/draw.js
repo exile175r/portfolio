@@ -1,4 +1,3 @@
-console.log('=========draw.js=========');
 let root = document.querySelector('project-content') ? document.querySelector('project-content').shadowRoot : document;
 const $ = function(sel){return root.querySelector(sel)};
 
