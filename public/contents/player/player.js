@@ -287,7 +287,6 @@ const fileDrop = function(e){
   if(!target) return;
   switch(e.type){
     case 'dragenter':
-      document.body.classList.add('dragover');
       $playerArea.classList.add('on');
       dragCounter++;
     break;
@@ -302,7 +301,6 @@ const fileDrop = function(e){
     break;
     case 'drop':
       dragCounter = 0;
-      document.body.classList.remove('dragover');
       $playerArea.classList.remove('on');
       const file = e.dataTransfer.files[0];
       if (!file || !file.type.startsWith('video/')) {
@@ -346,14 +344,11 @@ const fileDrop = function(e){
   }
 }
 
-// 이벤트 리스너 등록 (속성으로 중복 방지)
-if (!root.hasAttribute('data-drop-events-registered')) {
-  root.addEventListener('dragover', fileDrop);
-  root.addEventListener('dragenter', fileDrop);
-  root.addEventListener('dragleave', fileDrop);
-  root.addEventListener('drop', fileDrop);
-  root.setAttribute('data-drop-events-registered', 'true');
-}
+// 이벤트 리스너 등록 (on 이벤트로 간단하게)
+root.ondragover = fileDrop;
+root.ondragenter = fileDrop;
+root.ondragleave = fileDrop;
+root.ondrop = fileDrop;
 
 // 접근성: aria-label 추가
 $playBtn.setAttribute('aria-label', '재생/일시정지');
