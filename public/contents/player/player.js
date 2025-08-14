@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(checkVideoStatus, 1000);
   
   // 3초 후 상태 확인
-  setTimeout(checkVideoStatus, 3000);
+  // setTimeout(checkVideoStatus, 3000);
   
   // 비디오 로드 확인
   console.log('Video loading check completed');
@@ -205,23 +205,23 @@ function Player() {
 
 player = new Player();
 
-const waitForDuration = (callback, interval = 100, maxTry = 50) => {
-  let tryCount = 0;
-  const timer = setInterval(() => {
-    if (!isNaN(media.duration) && isFinite(media.duration) && media.duration > 0) {
-      clearInterval(timer);
-      callback(media.duration);
-    } else if (++tryCount > maxTry) {
-      clearInterval(timer);
-      callback(0); // 실패 시 0 반환
-    }
-  }, interval);
-}
+// const waitForDuration = (callback, interval = 100, maxTry = 50) => {
+//   let tryCount = 0;
+//   const timer = setInterval(() => {
+//     if (!isNaN(media.duration) && isFinite(media.duration) && media.duration > 0) {
+//       clearInterval(timer);
+//       callback(media.duration);
+//     } else if (++tryCount > maxTry) {
+//       clearInterval(timer);
+//       callback(0); // 실패 시 0 반환
+//     }
+//   }, interval);
+// }
 
-// 사용 예시
-waitForDuration(() => {
-  $totalTime.textContent = player.duration();
-});
+// // 사용 예시
+// waitForDuration(() => {
+//   $totalTime.textContent = player.duration();
+// });
 
 let maxduration, percentage;
 let hr, min, sec, playTime = 0;
