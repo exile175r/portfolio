@@ -43,6 +43,31 @@ const nextConfig = {
         ],
       },
       {
+        source: '/contents/player/video/:path*',
+        headers: [
+          {
+            key: 'Access-Control-Allow-Origin',
+            value: '*'
+          },
+          {
+            key: 'Access-Control-Allow-Methods',
+            value: 'GET, HEAD, OPTIONS'
+          },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value: 'Origin, X-Requested-With, Content-Type, Accept, Range'
+          },
+          {
+            key: 'Access-Control-Expose-Headers',
+            value: 'Content-Length, Content-Range'
+          },
+          {
+            key: 'Accept-Ranges',
+            value: 'bytes'
+          }
+        ],
+      },
+      {
         source: '/video/:path*',
         headers: [
           {

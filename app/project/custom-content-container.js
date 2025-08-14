@@ -858,6 +858,16 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
       
       if (parseFloat(fileSizeMB) < 0.01) {
         console.warn('⚠️ Video file is very small:', fileSizeMB, 'MB - might be corrupted');
+        
+        // 추가 디버깅: 응답 내용 확인
+        if (videoBlob.size < 1000) { // 1KB 미만인 경우
+          const textContent = await videoBlob.text();
+          console.error('🔍 Small blob content preview:', textContent.substring(0, 200));
+          
+          if (textContent.includes('<!DOCTYPE') || textContent.includes('<html')) {
+            throw new Error('Video file returned HTML instead of video content - likely a 404 or redirect page');
+          }
+        }
       }
       
       const blobURL = URL.createObjectURL(videoBlob);
