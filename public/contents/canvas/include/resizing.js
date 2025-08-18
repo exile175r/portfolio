@@ -8,6 +8,7 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
   const fig = figureInfo[idx];
   const minSize = 20;
   let $t, prevX, prevY, parentInfo, parentStyle;
+  let isReverse = false;
   const {left: cvsL, top: cvsT} = $('#canvas').getBoundingClientRect();
   targetList.forEach(($, i) => {
     targetInfo.push({x: JSON.parse($.getAttribute('x')), y: JSON.parse($.getAttribute('y'))});
@@ -18,18 +19,22 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
                    parentStyle.replace(/translate\(|px,|px\)/g, '').split(' ').map(v =>  JSON.parse(v))
                    :
                    [0, 0];
-      prevX = (targetInfo[i].x + parentInfo[0]) - cvsL / zoom;
-      prevY = (targetInfo[i].y + parentInfo[1]) - cvsT / zoom;
+      prevX = (targetInfo[i].x + parentInfo[0]) / zoom;
+      prevY = (targetInfo[i].y + parentInfo[1]) / zoom;
       
       thickness = JSON.parse(figure.getAttribute('stroke-width'));
+
+      if(figure.tagName == 'ellipse'){
+        if(fig.esx == -1 || fig.esy == -1) isReverse = true;
+      }
       
       onpointermove = resizingMove;
       onpointerup = resizingEnd;
     }
     
     const resizingMove = ({x, y}) => {
-      const moveX = ((x - cvsL) / zoom - prevX);
-      const moveY = ((y - cvsT) / zoom - prevY);
+      const moveX = (x / zoom - prevX - cvsL - 5);
+      const moveY = (y / zoom - prevY - cvsT - 5);
 
       switch (figure.closest('g').classList[0]) {
         case 'line':
@@ -42,6 +47,11 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
           rectResizing(i, moveX, moveY);
         break;
         case 'ellipse':
+          if(isReverse){
+            if(fig.esx == -1) targetList[0].style.setProperty('--esx', 1);
+            if(fig.esy == -1) targetList[0].style.setProperty('--esy', 1);
+            isReverse = false;
+          }
           ellipseResizing(i, moveX, moveY);
         break;
       }
@@ -62,7 +72,6 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
         pos.y = JSON.parse(targetList[i].getAttribute('y'));
         return pos;
       })
-      console.log('fig: ', fig);
     }
   });
 
@@ -70,38 +79,38 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
   const rectResizing = (i, moveX, moveY) => {
     switch (i) {
       case 0:
-        wid = fig.width - moveX;
-        hei = fig.height - moveY;
+        wid = fig.width - (moveX * fig.rsx);
+        hei = fig.height - (moveY * fig.rsy);
         if(wid >= minSize){
           figure.setAttribute('width', abs(wid));
-          figure.setAttribute('x', fig.x + moveX);
+          figure.setAttribute('x', fig.x + (moveX * fig.rsx));
           targetList[2].setAttribute('x', targetInfo[i].x + moveX);
         }
         if(hei >= minSize){
           figure.setAttribute('height', abs(hei));
-          figure.setAttribute('y', fig.y + moveY);
+          figure.setAttribute('y', fig.y + (moveY * fig.rsy));
           targetList[1].setAttribute('y', targetInfo[i].y + moveY);
         }
       break;
       case 1:
-        wid = fig.width + moveX;
-        hei = fig.height - moveY;
+        wid = fig.width + (moveX * fig.rsx);
+        hei = fig.height - (moveY * fig.rsy);
         if(wid >= minSize){
           figure.setAttribute('width', abs(wid));
           targetList[3].setAttribute('x', targetInfo[i].x + moveX);
         }
         if(hei >= minSize){
           figure.setAttribute('height', abs(hei));
-          figure.setAttribute('y', fig.y + moveY);
+          figure.setAttribute('y', fig.y + (moveY * fig.rsy));
           targetList[0].setAttribute('y', targetInfo[i].y + moveY);
         }
       break;
       case 2:
-        wid = fig.width - moveX;
-        hei = fig.height + moveY;
+        wid = fig.width - (moveX * fig.rsx);
+        hei = fig.height + (moveY * fig.rsy);
         if(wid >= minSize){
           figure.setAttribute('width', abs(wid));
-          figure.setAttribute('x', fig.x + moveX);
+          figure.setAttribute('x', fig.x + (moveX * fig.rsx));
           targetList[0].setAttribute('x', targetInfo[i].x + moveX);
         }
         if(hei >= minSize){
@@ -110,8 +119,8 @@ const resizing = (figure, targetList, figureInfo, idx, rotate = null) => {
         }
       break;
       case 3:
-        wid = fig.width + moveX;
-        hei = fig.height + moveY;
+        wid = fig.width + (moveX * fig.rsx);
+        hei = fig.height + (moveY * fig.rsy);
         if(wid >= minSize){
           figure.setAttribute('width', abs(wid));
           targetList[1].setAttribute('x', targetInfo[i].x + moveX);

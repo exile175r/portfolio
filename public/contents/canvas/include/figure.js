@@ -24,11 +24,12 @@ function Figure(svg, figure){
   let prevX, prevY;
   let f, fp, r0, r1, r2, r3, r4, img;
   let rAttr;
+  let rs = {}, es = {};
   const start = ({target, x, y}) => {
     if(target != svg) return;
     this.onFigureDrawStart?.();
-    x -= cvsL / zoom;
-    y -= cvsT / zoom;
+    x = (x - cvsL) / zoom;
+    y = y - cvsT / zoom;
     switch(figure){
       case 'line':
         f = newSVGTag(figure, {'x1': x, 'y1': y, 'x2': x, 'y2': y, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'none'});
@@ -83,10 +84,20 @@ function Figure(svg, figure){
         r2.style.cssText = `--ox:${x}px;--oy:${y}px;--r:${getAngle(prevX, prevY, x, y)}deg;`;
       break;
       case 'rect':
-        if(x-prevX < 0) f.style.setProperty('--rsx', -1);
-        else f.style.setProperty('--rsx', 1);
-        if(y-prevY < 0) f.style.setProperty('--rsy', -1);
-        else f.style.setProperty('--rsy', 1);
+        if(x-prevX < 0) {
+          f.style.setProperty('--rsx', -1);
+          rs.rsx = -1;
+        }else{
+          f.style.setProperty('--rsx', 1);
+          rs.rsx = 1;
+        }
+        if(y-prevY < 0){
+          f.style.setProperty('--rsy', -1);
+          rs.rsy = -1;
+        }else{
+          f.style.setProperty('--rsy', 1);
+          rs.rsy = 1;
+        }
         const rectW = Math.abs(x-prevX)-this.thickness;
         const rectH = Math.abs(y-prevY)-this.thickness;
         f.setAttribute('width', rectW < 0 ? 1 : rectW);
@@ -107,32 +118,48 @@ function Figure(svg, figure){
           f.style.setProperty('--esx', -1);
           r0.style.setProperty('--esx', -1);
           img.setAttribute('x', prevX);
+          es.esx = -1;
         }else{
           f.style.setProperty('--esx', 1);
           r0.style.setProperty('--esx', 1);
           img.setAttribute('x', x);
+          es.esx = 1;
         }
         if(y-prevY < 0){
           f.style.setProperty('--esy', -1);
           r0.style.setProperty('--esy', -1);
           img.setAttribute('y', prevY);
+          es.esy = -1;
         }else{
           f.style.setProperty('--esy', 1);
           r0.style.setProperty('--esy', 1);
           img.setAttribute('y', y);
+          es.esy = 1;
         }
         r0.setAttribute('width', ellipseW);
         r0.setAttribute('height', ellipseH);
       break;
     }
   }
+  const minSize = 20;
   let idx = 0;
   const end = () => {
+    if(figure == 'rect'){
+      if(+f.getAttribute('width') < minSize && +f.getAttribute('height') < minSize){
+        svg.querySelector('g:last-child').remove();
+        return;
+      }
+    }
+    if(figure == 'ellipse'){
+      if(+f.getAttribute('rx') < minSize/2 && +f.getAttribute('ry') < minSize/2){
+        svg.querySelector('g:last-child').remove();
+        return;
+      }
+    }
     this.onFigureDrawEnd?.();
     onpointermove = null;
     onpointerup = null;
     idx = figureInfo.length - 1;
-    console.log('figureInfo: ', figureInfo);
     ['width', 'height', 'x', 'y', 'rx', 'ry', 'cx', 'cy', 'x1', 'x2', 'y1', 'y2'].map(v => {
       let attr = JSON.parse(f.getAttribute(v));
       if(!attr) return;
@@ -146,9 +173,11 @@ function Figure(svg, figure){
         resizing(f, [fp, r1, r2], figureInfo, idx);
       break;
       case 'rect':
+        figureInfo[idx] = {...figureInfo[idx], ...rs};
         resizing(f, [r1, r2, r3, r4], figureInfo, idx);
       break;
       case 'ellipse':
+        figureInfo[idx] = {...figureInfo[idx], ...es};
         resizing(f, [r0, img], figureInfo, idx);
       break;
     }
