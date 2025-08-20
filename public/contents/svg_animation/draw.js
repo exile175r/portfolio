@@ -74,11 +74,13 @@ function Draw(canvas){
   }
   this.ondraw = () => { canvas.onpointerdown = drawStart; }
 }
+
 const newSVGTag = (elementType, attributes = {}) => {
   const element = document.createElementNS('http://www.w3.org/2000/svg', elementType);
   Object.entries(attributes).map(a => element.setAttribute(a[0],a[1]));
   return element;
 }
+
 const images = {};
 const svgToImage = (() => {
   const imagePathList = [
@@ -124,6 +126,7 @@ const svgToImage = (() => {
     imageData.d = canvas.toDataURL('image/png');
   })
 })();
+
 const convertToLowercaseCommands = (d) => {
   const commands = d.match(/[a-zA-Z][^a-zA-Z]*/g);
   let currentX = 0, currentY = 0;
@@ -163,6 +166,7 @@ const convertToLowercaseCommands = (d) => {
 
   return path.trim();
 }
+
 const coordinatesToPathD = (coords) => {
   if (coords.length === 0) return '';
   let d = '';
@@ -262,6 +266,7 @@ $startBtn.onclick = () => {
   }
 }
 
-
-
-
+// Intro 화면 초기화
+$('#introClose').onclick = () => {
+  $('#intro').remove();
+};

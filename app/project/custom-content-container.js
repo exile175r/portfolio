@@ -493,6 +493,8 @@ if (typeof window !== 'undefined' && typeof HTMLElement !== 'undefined') {
          #content {
            width: 100%;
            height: 100%;
+           overflow: hidden;
+           touch-action: none;
          }
          
          .error-message {

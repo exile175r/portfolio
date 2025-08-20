@@ -5,63 +5,6 @@ import ProjectContent from "./project-content";
 const DATABASE_ID = process.env.NOTION_DATABASE_ID;
 const TOKEN = process.env.NOTION_TOKEN;
 
-// 더미 프로젝트 데이터 (환경변수가 없을 때 사용)
-const dummyProjects = {
-  results: [
-    {
-      id: '1',
-      cover: null,
-      properties: {
-        이름: {
-          title: [{ plain_text: 'Canvas Drawing Tool' }]
-        },
-        'AI 요약': {
-          rich_text: [{ plain_text: 'HTML5 Canvas를 사용한 드로잉 도구입니다. 다양한 도형과 텍스트를 그릴 수 있습니다.' }]
-        },
-        'AI 키워드': [
-          { id: '1', name: 'Canvas', color: 'blue' },
-          { id: '2', name: 'Drawing', color: 'green' },
-          { id: '3', name: 'HTML5', color: 'purple' }
-        ]
-      }
-    },
-    {
-      id: '2',
-      cover: null,
-      properties: {
-        이름: {
-          title: [{ plain_text: 'SVG Animation' }]
-        },
-        'AI 요약': {
-          rich_text: [{ plain_text: 'SVG를 사용한 애니메이션 프로젝트입니다. 인터랙티브한 그래픽 요소를 제공합니다.' }]
-        },
-        'AI 키워드': [
-          { id: '4', name: 'SVG', color: 'red' },
-          { id: '5', name: 'Animation', color: 'orange' },
-          { id: '6', name: 'Interactive', color: 'blue' }
-        ]
-      }
-    },
-    {
-      id: '3',
-      cover: null,
-      properties: {
-        이름: {
-          title: [{ plain_text: 'Video Player' }]
-        },
-        'AI 요약': {
-          rich_text: [{ plain_text: '커스텀 비디오 플레이어입니다. 다양한 컨트롤과 기능을 제공합니다.' }]
-        },
-        'AI 키워드': [
-          { id: '7', name: 'Video', color: 'green' },
-          { id: '8', name: 'Player', color: 'blue' },
-          { id: '9', name: 'Custom', color: 'purple' }
-        ]
-      }
-    }
-  ]
-};
-
 export default async function Page() {
   // 환경변수 검증
   const hasValidEnvVars = DATABASE_ID && 
@@ -74,7 +17,19 @@ export default async function Page() {
                          TOKEN.trim() !== '';
 
   if (!hasValidEnvVars) {
-    return <ProjectContent projects={dummyProjects} />;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          환경변수 설정 오류
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Notion API 설정이 완료되지 않았습니다.
+        </p>
+        <p className="text-sm text-gray-500">
+          NOTION_DATABASE_ID와 NOTION_TOKEN 환경변수를 확인해주세요.
+        </p>
+      </div>
+    );
   }
 
   // Notion API 호출
@@ -115,6 +70,24 @@ export default async function Page() {
     
   } catch (error) {
     console.error('Error fetching projects:', error);
-    return <ProjectContent projects={dummyProjects} />;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          프로젝트 데이터 로드 실패
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Notion API에서 프로젝트 데이터를 가져오는 중 오류가 발생했습니다.
+        </p>
+        <p className="text-sm text-gray-500">
+          잠시 후 다시 시도해주세요.
+        </p>
+        <details className="mt-4 text-sm">
+          <summary className="cursor-pointer text-blue-600">오류 상세정보</summary>
+          <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto max-w-md">
+            {error.message}
+          </pre>
+        </details>
+      </div>
+    );
   }
 }

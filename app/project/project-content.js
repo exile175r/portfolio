@@ -61,7 +61,7 @@ export default function ProjectContent({ projects }) {
         <h2 className="ml-6 text-4xl font-bold sm:text-6ml">
           총 프로젝트 : {projectResults.length}
         </h2>
-        <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full">
+        <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full lg:grid-cols-3">
           {projectResults.map((aProject, i) => (
             <div
               key={aProject.id}

@@ -254,6 +254,7 @@ const timeupdate = () => {
 const play_pause = ({ target }) => {
   // timeupdate 함수는 한 번만 등록
   if(!player.ontimeupdate) player.ontimeupdate = timeupdate;
+  if(isIntro) return;
   
   if(media.paused) {
     player.play();
@@ -439,6 +440,7 @@ let delay;
 document.addEventListener('keydown', (e) => {
   // 입력창 등에서 입력 중일 때는 무시
   if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+  if(isIntro) return;
 
   if(delay) clearTimeout(delay);
 
@@ -487,7 +489,9 @@ document.addEventListener('keydown', (e) => {
 
 const $intro = $('#intro');
 const $introClose = $('#introClose');
+let isIntro = true;
 $introClose.onclick = () => {
   if($totalTime.textContent == '') $totalTime.textContent = player.duration();
   $intro.style.display = 'none';
+  isIntro = false;
 };
