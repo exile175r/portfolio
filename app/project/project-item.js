@@ -17,6 +17,7 @@ export default function ProjectItem({data}){
           style={{ objectFit: 'none' }}
           alt="project cover image"
           priority
+          unoptimized
         />
       </div>
       <div className="info rounded-b-xl">

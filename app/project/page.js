@@ -2,6 +2,8 @@
 import {DATABASE_ID, TOKEN} from "../../config";
 import ProjectContent from "./project-content";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Page() {
   const options = {
     method: 'POST',
@@ -19,7 +21,8 @@ export default async function Page() {
         }
       ],
       page_size: 100
-    })
+    }),
+    cache: 'no-store'
   };
 
   const res = await fetch(`https://api.notion.com/v1/databases/${DATABASE_ID}/query`, options);
