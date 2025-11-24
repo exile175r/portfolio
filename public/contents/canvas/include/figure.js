@@ -1,66 +1,63 @@
 const newSVGTag = (elementType, attributes = {}, text = '') => {
   const element = document.createElementNS('http://www.w3.org/2000/svg', elementType);
   Object.entries(attributes).map(a => element.setAttribute(a[0],a[1]));
-  if(!attributes.class) figureInfo.push(attributes);
+  if(!attributes.class && !attributes.points) figureInfo.push(attributes);
   if (text) {
     const textNode = document.createTextNode(text);
     element.appendChild(textNode);
   }
   return element;
 }
+const {left: cvsL, top: cvsT} = $('#canvas').getBoundingClientRect();
 function Figure(svg, figure){
   const svgTagBundle = (arr, svg, figure) => {
-    const g = newSVGTag('g', {'class': figure});
+    const g = newSVGTag('g', {'class': `${figure} on`});
     for (const $ of arr) g.append($);
     svg.append(g);
   }
   const getAngle = (x1, y1, x2, y2) => {
-    var rad = Math.atan2(y2 - y1, x2 - x1);
+    let rad = Math.atan2(y2 - y1, x2 - x1);
     return (rad*180)/Math.PI ;
   }
-  this.color = '#000';
-  this.thickness = 10;
+  // this.color = '#000';
+  // this.thickness = 10;
   let prevX, prevY;
-  let f, fp, r0, r1, r2, r3, r4, rotate;
+  let f, fp, r0, r1, r2, r3, r4, img;
   let rAttr;
+  let rs = {}, es = {};
   const start = ({target, x, y}) => {
     if(target != svg) return;
     this.onFigureDrawStart?.();
-    x = x / zoom - zoomL;
-    y = y / zoom;
+    x = (x - cvsL) / zoom;
+    y = y - cvsT / zoom;
     switch(figure){
       case 'line':
         f = newSVGTag(figure, {'x1': x, 'y1': y, 'x2': x, 'y2': y, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'none'});
-        rAttr = {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'fill': '#1884ec'};
-        r1 = newSVGTag('rect', rAttr);
-        r2 = newSVGTag('rect', rAttr);
+        r1 = newSVGTag('rect', {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
+        r2 = newSVGTag('rect', {class: 're', 'x': x, 'y': y, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
         svgTagBundle([f, r1, r2], svg, figure);
       break;
       case 'arrow':
         f = newSVGTag('line', {'x1': x, 'y1': y, 'x2': x, 'y2': y, 'stroke': `${this.color}`, 'stroke-width':`${this.thickness}`, 'fill': 'none'});
         fp = newSVGTag('polygon', {'points': `${x},${y - this.thickness} ${x},${y + this.thickness} ${x + this.thickness * 2},${y}`, 'fill': this.color});
-        rAttr = {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'fill': '#1884ec'};
+        rAttr = {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'};
         r1 = newSVGTag('rect', rAttr);
         r2 = newSVGTag('rect', rAttr);
         svgTagBundle([f, fp, r1, r2], svg, 'arrow');
       break;
       case 'rect':
-        f = newSVGTag(figure, {'x': x+this.thickness/2, 'y': y+this.thickness/2, 'width': 0, 'height': 0, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'transparent'});
-        r1 = newSVGTag('circle', {class: 're', 'cx': x, 'cy': y, 'r': 5, 'fill': '#1884ec'});
-        r2 = newSVGTag('circle', {class: 're', 'cx': x, 'cy': y, 'r': 5, 'fill': '#1884ec'});
-        r3 = newSVGTag('circle', {class: 're', 'cx': x, 'cy': y, 'r': 5, 'fill': '#1884ec'});
-        r4 = newSVGTag('circle', {class: 're', 'cx': x, 'cy': y, 'r': 5, 'fill': '#1884ec'});
-        rotate = newSVGTag('image', {class: 'rotate', 'href': './img/rotate_button.svg', 'width': 30, 'height': 30, 'x': x - 15, 'y': y - 50});
-        svgTagBundle([f, r1, r2, r3, r4, rotate], svg, figure);
+        f = newSVGTag(figure, {'x': x+this.thickness/2, 'y': y+this.thickness/2, 'width': 0, 'height': 0, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'transparent', 'style': `transform-origin: ${x}px ${y}px;`});
+        r1 = newSVGTag('rect', {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
+        r2 = newSVGTag('rect', {class: 're', 'x': x+5, 'y': y-5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
+        r3 = newSVGTag('rect', {class: 're', 'x': x-5, 'y': y+5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
+        r4 = newSVGTag('rect', {class: 're', 'x': x+5, 'y': y+5, 'width': 10, 'height': 10, 'rx': 10, 'fill': '#1884ec'});
+        svgTagBundle([f, r1, r2, r3, r4], svg, figure);
       break;
       case 'ellipse':
-        f = newSVGTag(figure, {'cx': x, 'cy': y, 'rx': 0, 'ry': 0, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'transparent'});
-        r0 = newSVGTag('rect', {class: 'reBox', 'x': x, 'y': y, 'width': 0, 'height': 0, 'stroke': '#1884ec', 'stroke-width': 1, 'fill': 'none'});
-        r1 = newSVGTag('rect', {class: 're', 'x': x-5, 'y': y-5, 'width': 10, 'height': 10, 'fill': '#1884ec'});
-        r2 = newSVGTag('rect', {class: 're', 'x': x+5, 'y': y-5, 'width': 10, 'height': 10, 'fill': '#1884ec'});
-        r3 = newSVGTag('rect', {class: 're', 'x': x-5, 'y': y+5, 'width': 10, 'height': 10, 'fill': '#1884ec'});
-        r4 = newSVGTag('rect', {class: 're', 'x': x+5, 'y': y+5, 'width': 10, 'height': 10, 'fill': '#1884ec'});
-        svgTagBundle([f, r0, r1, r2, r3, r4], svg, figure);
+        f = newSVGTag(figure, {'cx': x, 'cy': y, 'rx': 0, 'ry': 0, 'stroke': `${this.color}`, 'stroke-width': `${this.thickness}`, 'fill': 'transparent', 'style': `transform-origin: ${x}px ${y}px;`});
+        r0 = newSVGTag('rect', {class: 'reBox', 'x': x, 'y': y, 'width': 0, 'height': 0, 'stroke': '#1884ec', 'stroke-width': 1, 'fill': 'none', 'style': `transform-origin: ${x}px ${y}px;`});
+        img = newSVGTag('image', {class: 're', 'href': 'contents/canvas/img/resize_button.svg', 'x': x, 'y': y, 'width': 20, 'height': 20, 'fill': 'none'});
+        svgTagBundle([f, r0, img], svg, figure);
       break;
     }
     prevX = x;
@@ -69,37 +66,46 @@ function Figure(svg, figure){
     onpointerup = end;
   }
   const move = ({x, y}) => {
-    x = x / zoom - zoomL;
-    y = y / zoom;
+    x -= cvsL / zoom;
+    y -= cvsT / zoom;
     switch(figure){
       case 'line':
         f.setAttribute('x2', x);
         f.setAttribute('y2', y);
-        r2.setAttribute('x', x-4);
-        r2.setAttribute('y', y-4);
+        r2.setAttribute('x', x-5);
+        r2.setAttribute('y', y-5);
       break;
       case 'arrow':
         f.setAttribute('x2', x);
         f.setAttribute('y2', y);
         fp.style.cssText = `--x:${x-prevX};--y:${y-prevY};--ox:${prevX}px;--oy:${prevY}px;--r:${getAngle(prevX, prevY, x, y)}deg;`;
-        r2.setAttribute('x', x+11);
-        r2.setAttribute('y', y-4);
-        r2.style.cssText = `--ox:${x}px;--oy:${y}px;--r:${getAngle(prevX, prevY, x+11, y-4)}deg;`;
+        r2.setAttribute('x', x);
+        r2.setAttribute('y', y-5);
+        r2.style.cssText = `--ox:${x}px;--oy:${y}px;--r:${getAngle(prevX, prevY, x, y)}deg;`;
       break;
       case 'rect':
-        if(x-prevX < 0) f.style.setProperty('--rsx', -1);
-        else f.style.setProperty('--rsx', 1);
-        if(y-prevY < 0) f.style.setProperty('--rsy', -1);
-        else f.style.setProperty('--rsy', 1);
+        if(x-prevX < 0) {
+          f.style.setProperty('--rsx', -1);
+          rs.rsx = -1;
+        }else{
+          f.style.setProperty('--rsx', 1);
+          rs.rsx = 1;
+        }
+        if(y-prevY < 0){
+          f.style.setProperty('--rsy', -1);
+          rs.rsy = -1;
+        }else{
+          f.style.setProperty('--rsy', 1);
+          rs.rsy = 1;
+        }
         const rectW = Math.abs(x-prevX)-this.thickness;
         const rectH = Math.abs(y-prevY)-this.thickness;
         f.setAttribute('width', rectW < 0 ? 1 : rectW);
         f.setAttribute('height', rectH < 0 ? 1 : rectH);
-        r2.setAttribute('cx', x);
-        r3.setAttribute('cy', y);
-        r4.setAttribute('cx', x);
-        r4.setAttribute('cy', y);
-        rotate.setAttribute('x', x - rectW / 2 - 15);
+        r2.setAttribute('x', x-5);
+        r3.setAttribute('y', y-5);
+        r4.setAttribute('x', x-5);
+        r4.setAttribute('y', y-5);
       break;
       case 'ellipse':
         const ellipseW = Math.abs(x-prevX);
@@ -111,37 +117,69 @@ function Figure(svg, figure){
         if(x-prevX < 0){
           f.style.setProperty('--esx', -1);
           r0.style.setProperty('--esx', -1);
+          img.setAttribute('x', prevX);
+          es.esx = -1;
         }else{
           f.style.setProperty('--esx', 1);
           r0.style.setProperty('--esx', 1);
+          img.setAttribute('x', x);
+          es.esx = 1;
         }
         if(y-prevY < 0){
           f.style.setProperty('--esy', -1);
           r0.style.setProperty('--esy', -1);
+          img.setAttribute('y', prevY);
+          es.esy = -1;
         }else{
           f.style.setProperty('--esy', 1);
           r0.style.setProperty('--esy', 1);
+          img.setAttribute('y', y);
+          es.esy = 1;
         }
-
         r0.setAttribute('width', ellipseW);
         r0.setAttribute('height', ellipseH);
-        r2.setAttribute('x', x-5);
-        r3.setAttribute('y', y-5);
-        r4.setAttribute('x', x-5);
-        r4.setAttribute('y', y-5);
       break;
     }
   }
+  const minSize = 20;
+  let idx = 0;
   const end = () => {
+    if(figure == 'rect'){
+      if(+f.getAttribute('width') < minSize && +f.getAttribute('height') < minSize){
+        svg.querySelector('g:last-child').remove();
+        return;
+      }
+    }
+    if(figure == 'ellipse'){
+      if(+f.getAttribute('rx') < minSize/2 && +f.getAttribute('ry') < minSize/2){
+        svg.querySelector('g:last-child').remove();
+        return;
+      }
+    }
     this.onFigureDrawEnd?.();
     onpointermove = null;
     onpointerup = null;
-    if(figure == 'rect'){
-      const currentIdx = figureInfo.length - 1;
-      ['width', 'height', 'x', 'y'].map(v => {
-        figureInfo[currentIdx][v] = JSON.parse(f.getAttribute(v));
-      })
-      resizing(f, [r1, r2, r3, r4], figureInfo, rotate, currentIdx);
+    idx = figureInfo.length - 1;
+    ['width', 'height', 'x', 'y', 'rx', 'ry', 'cx', 'cy', 'x1', 'x2', 'y1', 'y2'].map(v => {
+      let attr = JSON.parse(f.getAttribute(v));
+      if(!attr) return;
+      figureInfo[idx][v] = attr;
+    });
+    switch(figure){
+      case 'line':
+        resizing(f, [r1, r2], figureInfo, idx);
+      break;
+      case 'arrow':
+        resizing(f, [fp, r1, r2], figureInfo, idx);
+      break;
+      case 'rect':
+        figureInfo[idx] = {...figureInfo[idx], ...rs};
+        resizing(f, [r1, r2, r3, r4], figureInfo, idx);
+      break;
+      case 'ellipse':
+        figureInfo[idx] = {...figureInfo[idx], ...es};
+        resizing(f, [r0, img], figureInfo, idx);
+      break;
     }
   }
   this.ondraw = () => { svg.onpointerdown = start; }

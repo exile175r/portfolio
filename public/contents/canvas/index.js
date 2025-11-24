@@ -6,11 +6,12 @@ const $$dSection = $drawTool.querySelectorAll('section');
 const $inputHue = $('input[type="range"]#hue');
 const $color = $('.colorPicker');
 let thickness = 10, colorPick, drawTool = 'pen', colors = '#000';
+let isDraw = true;
 
-const canvas = document.getElementById('canvas');
-const highlightCanvas = document.getElementById('highlightCanvas');
-canvas.width = 1280;
-canvas.height = 800;
+const canvas = $('#canvas');
+const highlightCanvas = $('#highlightCanvas');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 highlightCanvas.width = canvas.width;
 highlightCanvas.height = canvas.height;
 const paint = new Draw(canvas);
@@ -68,6 +69,37 @@ const allClear = () => {
   // addHistory(canvas.toDataURL());
 }
 
+const displayColor = (color) => {
+  $drawTool.querySelector('.colorBox').style.backgroundColor = color;
+}
+
+root.addEventListener('pointerdown', ({target}) => {
+  if(isDraw){
+    if(target.tagName == 'g' ||
+      target.parentNode.tagName == 'g' ||
+      target.closest('[data-color]') ||
+      target.closest('[for$="_color"]')
+    ) return;
+    
+    $figureBox.querySelector('g.on')?.classList.remove('on');
+  }else{
+    if(target.closest('.text') ||
+       target.closest('.textSetting') ||
+       target.closest('[data-color]') ||
+       target.closest('[for$="_color"]')
+      ) return;
+    console.log('target: ', target);
+    $textBox.querySelector('.text.on')?.classList.remove('on');
+  }
+});
+
+addEventListener('keyup', ({key}) => {
+  // console.log('key: ', key);
+  if(key == 'Delete'){
+    $figureBox.querySelector('g.on')?.remove();
+  }
+});
+
 // 그리기 텍스트 전환 탭
 for (const $ of $$tab)
 $.onclick = ({target}) => {
@@ -76,6 +108,20 @@ $.onclick = ({target}) => {
   target.classList.add('on');
   $drawTool.querySelector('section:not(.hide)').classList.add('hide');
   $$dSection[idx].classList.remove('hide');
+  isDraw = !idx;
+  if(!isDraw){
+    $canvasBox.closest('#canvasBox:not(.eNone)')?.classList.add('eNone');
+    $figureBox.closest('#figure:not(.eNone)')?.classList.add('eNone');
+    $drawTool.querySelector('.drawColor > div:not(.hidden)')?.classList.add('hidden');
+    $textBox.closest('#textBox.eNone')?.classList.remove('eNone');
+  }else{
+    $canvasBox.closest('#canvasBox.eNone')?.classList.remove('eNone');
+    $textBox.closest('#textBox:not(.eNone)')?.classList.add('eNone');
+    if(drawTool == 'line' || drawTool == 'arrow' || drawTool == 'rect' || drawTool == 'ellipse'){
+      $figureBox.closest('#figure.eNone')?.classList.remove('eNone');
+      $drawTool.querySelector('.drawColor > div.hidden')?.classList.remove('hidden');
+    }
+  }
 }
 
 // 배경 색 변경 (input[range])
@@ -116,17 +162,24 @@ $.onclick = ({target}) => {
   }
   const figureDrawEnd = () => {
     const $g = $figureBox.querySelector('g:last-child');
-    const $lastFigure = $g.children[0];
+    const $lastFigure = $g.querySelector(':first-child');
     $g.classList.add('on');
     const figureDrag = new Drag($lastFigure);
     figureDrag.ondrag();
     figureDrag.$t = $g;
     $lastFigure.addEventListener('pointerdown', ({target}) => {
       $figureBox.querySelector('g.on')?.classList.remove('on');
-      target.closest('g').classList.add('on');
+      const $g = target.closest('g');
+      $g.classList.add('on');
+      if($g.classList[0] == 'rect' || $g.classList[0] == 'ellipse'){
+        $drawTool.querySelector('.drawColor > div.hidden')?.classList.remove('hidden');
+      }else{
+        $drawTool.querySelector('.drawColor > div:not(.hidden)')?.classList.add('hidden');
+      }
     })
     // $lastFigure.querySelectorAll('.re').forEach($ => $.onpointerdown = () => { figureDrag.removeEvent(); })
   }
+  $drawTool.querySelector('.drawColor > div:not(.hidden)')?.classList.add('hidden');
   switch (drawTool) {
     case 'highlighter':
       $color.classList.remove('hidden');
@@ -146,6 +199,7 @@ $.onclick = ({target}) => {
       line.ondraw();
       line.onFigureDrawStart = () => {
         line.color = colors;
+        line.thickness = thickness;
       }
       line.onFigureDrawEnd = () => figureDrawEnd();
     break;
@@ -156,28 +210,39 @@ $.onclick = ({target}) => {
       arrow.ondraw();
       arrow.onFigureDrawStart = () => {
         arrow.color = colors;
+        arrow.thickness = thickness;
       }
       arrow.onFigureDrawEnd = () => figureDrawEnd();
     break;
     case 'rect':
       $color.classList.remove('hidden');
       $figureBox.classList.remove('eNone');
+      $drawTool.querySelector('.drawColor > div.hidden')?.classList.remove('hidden');
       const rect = new Figure($figureBox, drawTool);
       rect.ondraw();
       rect.onFigureDrawStart = () => {
         rect.color = colors;
         rect.thickness = thickness;
+
+        const colorInput = $drawTool.querySelectorAll('.drawColor > div input');
+        colorInput[0].checked = true;
+        colorInput[1].checked = false;
       }
       rect.onFigureDrawEnd = () => figureDrawEnd();
     break;
     case 'ellipse':
       $color.classList.remove('hidden');
       $figureBox.classList.remove('eNone');
+      $drawTool.querySelector('.drawColor > div.hidden')?.classList.remove('hidden');
       const ellipse = new Figure($figureBox, drawTool);
       ellipse.ondraw();
       ellipse.onFigureDrawStart = () => {
         ellipse.color = colors;
         ellipse.thickness = thickness;
+
+        const colorInput = $drawTool.querySelectorAll('.drawColor > div input');
+        colorInput[0].checked = true;
+        colorInput[1].checked = false;
       }
       ellipse.onFigureDrawEnd = () => figureDrawEnd();
     break;
@@ -188,25 +253,43 @@ $.onclick = ({target}) => {
   }
 }
 
-addEventListener('pointerdown', ({target}) => {
-  if(target.tagName == 'g' || target.parentNode.tagName == 'g') return;
-  $figureBox.querySelector('g.on')?.classList.remove('on');
-})
-
 // color 선택
 for (const $ of $drawTool.querySelectorAll('.drawColor li'))
 $.onclick = ({target}) => {
-  const dataColor = target.dataset.color;
-  if(target.className){
-    $color.className = 'colorPicker';
-    colorPick = target;
-    if(dataColor) colors = dataColor;
-  }else{
-    colors = dataColor;
-  }
   const targetOn = $drawTool.querySelector('.drawColor li.on');
   if(targetOn) targetOn.className = '';
-  if(target.dataset.color) target.className = 'on';
+  // if(target.dataset.color != '') target.className = 'on';
+  target.className = 'on';
+  if(target.dataset.color == '') return;
+  colors = target.dataset.color;
+  displayColor(colors);
+  if(isDraw){
+    let figure = $figureBox.querySelector('g.on');
+    if(!figure) return;
+    switch (figure.classList[0]) {
+      case 'line':
+        figure.children[0].setAttribute('stroke', colors);
+      break;
+      case 'arrow':
+        figure.children[0].setAttribute('stroke', colors);
+        figure.children[1].setAttribute('fill', colors);
+      break;
+      case 'rect': case 'ellipse':
+        $drawTool.querySelector('.drawColor > div').classList.remove('hidden');
+        let isCheckd = $drawTool.querySelectorAll('.drawColor > div input')[0].checked;
+        if(isCheckd){
+          figure.children[0].setAttribute('stroke', colors);
+        }else{
+          figure.children[0].setAttribute('fill', colors);
+        }
+      break;
+    }
+  }else{
+    let text = $textBox.querySelector('.text.on');
+    if(!text) return;
+    text.querySelector('textarea').style.color = colors;
+  }
+  
 }
 
 // 두께 선택
@@ -284,15 +367,15 @@ const hsv = {
 const addColor = () => {
   const rgb = `rgb(${hsv2rgb(hsv).r}, ${hsv2rgb(hsv).g}, ${hsv2rgb(hsv).b})`;
   colors = rgb;
+  let colorPick = $drawTool.querySelector('.drawColor li.on');
   colorPick.dataset.color = rgb;
   colorPick.style.backgroundColor = rgb;
   colorPick.textContent = '';
-  colorPick.className = 'on';
+  displayColor(colors);
 }
 const hueColor = () => {
   $color.style.setProperty('--hue', (hsv.h = +$inputHue.value) + 'deg');
   // console.log(hsv2rgb(hsv));
-  addColor();
 }
 $inputHue.oninput = hueColor;
 const $colorPlate = $('.cp_color_plate');
@@ -306,6 +389,9 @@ $colorPlate.onpointerdown = (e) => {
   plateMove({x, y})
   addEventListener('pointermove', plateMove, { passive: true });
   addEventListener('pointerup', plateMoveEnd, { once: true });
+
+  // 도형 선택 해제
+  $figureBox.querySelector('g.on')?.classList.remove('on');
 };
 const plateMove = ({ x, y }) => {
   const s = clamp(0, x - plateL, plateW);
@@ -326,83 +412,131 @@ const plateMoveEnd = () => {
 
 const $textBox = $('#textBox');
 const $textAdd = $drawTool.querySelector('.textAdd button');
+const $$txtDecoInput = $drawTool.querySelectorAll('.textSetting div input');
+const $fontSelect = $drawTool.querySelector('.textSetting #font');
 let fontSize = 12;
+const fontSetList = [];
+const textIdx = ($$, target) => [...$$].indexOf(target);
 
 $textAdd.onclick = () => {
   $textBox.querySelector('.text.on')?.classList.remove('on');
+  
+  if(!$textBox.children.length)
+    $drawTool.querySelector('.textSetting').classList.remove('eNone');
+  // $textBox.append($frag(`
+  //   <div class="text on" style="left: ${innerWidth / 2 - 180}px;top: ${innerHeight / 2 - 35}px">
+  //     <textarea></textarea>
+  //     <button><img src="img/close_button.svg"></button>
+  //     <div class="resize"><img src="img/resize_button.svg"></div>
+  //     <div class="rotate"><img src="img/rotate_button.svg"></div>
+  //   </div>
+  // `));
   $textBox.append($frag(`
-    <div class="text on" style="left: ${innerWidth / 2 - 180}px;top: ${innerHeight / 2 - 35}px">
-      <textarea></textarea>
-      <button><img src="img/close_button.svg"></button>
-      <div class="resize"><img src="img/text_resize_button.svg"></div>
-      <div class="rotate"><img src="img/rotate_button.svg"></div>
+    <div class="text on">
+      <textarea name="textarea" spellcheck="false"></textarea>
+      <button><img src="contents/canvas/img/close_button.svg"></button>
     </div>
   `));
   const $text = $textBox.querySelector('.text:last-child');
   const textBox = new Drag($text);
+  textBox.isStop = true;
   textBox.calc.wMax = innerWidth;
   textBox.calc.hMax = innerHeight;
   textBox.$t = $text.closest('.text');
   textBox.ondrag();
 
+  let fontVal = $fontSelect.selectedOptions[0].value;
+  fontSetList.push({
+    f: `${fontVal}`,
+    s: 12,
+    b: false, // bold
+    i: false, // italic
+    u: false  // underline
+  });
+
+  $$txtDecoInput.forEach(v => {v.checked = false});
+  const $textarea = $text.querySelector('textarea');
+  $textarea.style.fontFamily = fontVal;
+  $textarea.style.fontSize = '12px';
+  $textarea.style.color = colors;
+
+  const $fontTxt = $drawTool.querySelector('.textSetting div span');
+  $fontTxt.textContent = 12;
+
   $text.querySelector('button').onclick = ({target}) => {
     target.closest('.text').remove();
+    if(!$textBox.children.length){
+      $drawTool.querySelector('.textSetting').classList.add('eNone');
+      $$txtDecoInput.forEach(v => v.checked = false);
+      $fontTxt.textContent = 12;
+    }
   }
 
-  $text.querySelector('textarea').onpointerdown = ({target}) => {
+  $textarea.onpointerdown = ({target}) => {
     $textBox.querySelector('.text.on')?.classList.remove('on');
     target.closest('.text').classList.add('on');
+    const fontSet = fontSetList[textIdx($textBox.children, target.closest('.text'))];
 
-    if(target.style.fontSize == '') fontSize = 12;
+    fontSet.s = Number(target.style.fontSize.split('px')[0]);
+    $fontTxt.textContent = fontSet.s;
 
-    $drawTool.querySelectorAll('.textSetting div span').textContent = fontSize;
-  }
-  window.onpointerdown = ({target}) => {
-    if($textBox.querySelectorAll('.text').length && !target.closest('#drawTool') && !target.closest('.text')){
-      $textBox.querySelector('.text.on')?.classList.remove('on');
-    }
+    const is = ['b', 'i', 'u'].map(v => fontSet[v]);
+    $$txtDecoInput.forEach((v, i) => v.checked = is[i]);
   }
 }
 
 $drawTool.querySelectorAll('.textSetting div button').forEach($ => {
   $.onclick = ({target}) => {
+    const fontSet = fontSetList[textIdx($textBox.children, $textBox.querySelector('.text.on'))];
+    let size = fontSet.s;
     switch (target.dataset.text) {
       case 'down':
-        if(fontSize > 12) fontSize--;
+        if(size > 12) size--;
       break;
       case 'up':
-        fontSize++;
+        size++;
       break;
     }
-    target.closest('div').querySelector('span').textContent = fontSize;
+    target.closest('div').querySelector('span').textContent = size;
     Object.assign($textBox.querySelector('.text.on textarea').style, {
-      fontSize: `${fontSize}px`,
-      lineHeight: `${fontSize}px`
+      fontSize: `${size}px`,
+      lineHeight: `${size}px`
     });
+    fontSet.s = size;
   }
 });
 
 $drawTool.querySelectorAll('.textSetting div label').forEach($ => {
   $.onclick = ({target}) => {
     const $textarea = $textBox.querySelector('.text.on textarea');
+    const fontSet = fontSetList[textIdx($textBox.children, $textBox.querySelector('.text.on'))];
+    let isChecked = target.closest('div').querySelector(`#${target.getAttribute('for')}`).checked;
     switch (target.dataset.text) {
       case 'bold':
-        $textarea.style.fontWeight = 'bold';
+        if(!isChecked) $textarea.style.fontWeight = 'bold'; 
+        else $textarea.style.fontWeight = null;
+        fontSet.b = !isChecked;
       break;
       case 'italic':
-        $textarea.style.fontStyle = 'italic';
+        if(!isChecked) $textarea.style.fontStyle = 'italic';
+        else $textarea.style.fontStyle = null;
+        fontSet.i = !isChecked;
       break;
       case 'underline':
-        $textarea.style.textDecoration = 'underline';
+        if(!isChecked) $textarea.style.textDecoration = 'underline';
+        else $textarea.style.textDecoration = null;
+        fontSet.u = !isChecked;
       break;
     }
   }
 });
 
-
-
-
-
+$fontSelect.oninput = ({target}) => {
+  const $textarea = $textBox.querySelector('.text.on textarea');
+  const fontSet = fontSetList[textIdx($textBox.children, $textBox.querySelector('.text.on'))];
+  fontSet.f = target.selectedOptions[0].value;
+  $textarea.style.fontFamily = fontSet.f;
+}
 
 $('input[type="range"]#gauge').oninput = ({target}) => {
   const min = target.min;

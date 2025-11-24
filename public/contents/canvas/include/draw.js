@@ -28,8 +28,8 @@ function Draw(canvas){
     ctx.closePath();
   }
   const drawStart = ({x, y}) => {
-    x = (x - cvsL) / zoom - zoomL;
-    y = (y - cvsT) / zoom;
+    x -= cvsL / zoom;
+    y -= cvsT / zoom;
     this.ondrawstart?.({x, y});
     ctx.globalCompositeOperation = this.globalCompositeOperation;
     beginPoint = { x, y };
@@ -39,8 +39,8 @@ function Draw(canvas){
     addEventListener('pointerup', drawEnd, {passive: false});
   }
   const drawMove = ({x, y}) => {
-    x = (x - cvsL) / zoom - zoomL;
-    y = (y - cvsT) / zoom;
+    x -= cvsL;
+    y -= cvsT;
     points.unshift({ x, y });
     const controlPoint = points[1];
     const endPoint = {

@@ -3,4 +3,3 @@
 *.wmv filter=lfs diff=lfs merge=lfs -text
 *.flv filter=lfs diff=lfs merge=lfs -text
 *.mkv filter=lfs diff=lfs merge=lfs -text
-*.mp4 filter=lfs diff=lfs merge=lfs -text
