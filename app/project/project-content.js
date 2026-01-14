@@ -63,7 +63,15 @@ export default function ProjectContent({ projects }) {
         </h2>
         <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full lg:grid-cols-3">
           {projectResults.map((aProject, i) => {
-            const githubUrl = aProject.properties?.['Github']?.url;
+            const prop = aProject.properties || {};
+            const githubUrl = prop['Github']?.url ||
+              prop['github']?.url ||
+              prop['URL']?.url ||
+              prop['url']?.url ||
+              prop['Github']?.rich_text?.[0]?.plain_text ||
+              prop['github']?.rich_text?.[0]?.plain_text ||
+              prop['URL']?.rich_text?.[0]?.plain_text ||
+              prop['url']?.rich_text?.[0]?.plain_text;
 
             return (
               <div

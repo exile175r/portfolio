@@ -23,8 +23,12 @@ export default function ProjectItem({ data }) {
   // AI 키워드 추출 (안전하게)
   const keywords = prop['AI 키워드']?.multi_select || [];
 
-  // 외부 링크 URL 추출
-  const githubUrl = prop['Github']?.url || '';
+  // 외부 링크 URL 추출 (다양한 속성 이름 및 데이터 유형 대응)
+  const getUrl = (p) => {
+    if (!p) return null;
+    return p.url || p.rich_text?.[0]?.plain_text || null;
+  };
+  const githubUrl = getUrl(prop['Github']) || getUrl(prop['github']) || getUrl(prop['URL']) || getUrl(prop['url']) || '';
 
   return (
     <div className="flex flex-col h-full rounded-xl projectItem">
@@ -39,7 +43,12 @@ export default function ProjectItem({ data }) {
           unoptimized
         />
       </div>
-      <div className="flex flex-col flex-1 info rounded-b-xl">
+      <div className="flex flex-col flex-1 info rounded-b-xl relative">
+        {githubUrl && (
+          <div className="absolute top-2 right-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full backdrop-blur-sm border border-white/20">
+            외부 사이트 🔗
+          </div>
+        )}
         <h3>{title}</h3>
         <p>{summation}</p>
         <ul className="mt-auto flex gap-1 flex-wrap">
