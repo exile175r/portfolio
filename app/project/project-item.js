@@ -42,11 +42,23 @@ export default function ProjectItem({ data }) {
       <div className="flex flex-col flex-1 info rounded-b-xl">
         <h3>{title}</h3>
         <p>{summation}</p>
-        <ul className="mt-auto flex gap-1">
+        <ul className="mt-auto flex gap-1 flex-wrap">
           {keywords.map((v, index) => {
+            // 공식 로고 컬러 매핑
+            const brandColors = {
+              'HTML': { bg: '#E34F26', text: '#fff' },
+              'CSS': { bg: '#1572B6', text: '#fff' },
+              'JavaScript': { bg: '#F7DF1E', text: '#000' },
+              'Javascript': { bg: '#F7DF1E', text: '#000' },
+              'React': { bg: '#61DAFB', text: '#000' },
+              'Next.js': { bg: '#000', text: '#fff' }
+            };
+
+            const brandStyle = brandColors[v.name] || { bg: v.color, text: '#fff' };
+
             return <li
               key={v.id || index}
-              style={{ backgroundColor: v.color, color: '#fff' }} >
+              style={{ backgroundColor: brandStyle.bg, color: brandStyle.text }} >
               {v.name}
             </li>
           })}
