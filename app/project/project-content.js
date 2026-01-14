@@ -7,7 +7,7 @@ export default function ProjectContent({ projects }) {
   const [showContent, setShowContent] = useState(false);
   const [currentProjectId, setCurrentProjectId] = useState('');
 
-  
+
   if (!projects) {
     console.warn('Projects prop is null or undefined');
     return (
@@ -24,7 +24,7 @@ export default function ProjectContent({ projects }) {
 
   // results가 없으면 빈 배열로 처리
   const projectResults = projects.results || [];
-  
+
   if (!Array.isArray(projectResults)) {
     console.warn('Projects.results is not an array:', projectResults);
     return (
@@ -62,19 +62,29 @@ export default function ProjectContent({ projects }) {
           총 프로젝트 : {projectResults.length}
         </h2>
         <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full lg:grid-cols-3">
-          {projectResults.map((aProject, i) => (
-            <div
-              key={aProject.id}
-              onClick={() => handleProjectClick(i+1)}
-              style={{cursor: 'pointer'}}
-            >
-              <ProjectItem data={aProject} />
-            </div>
-          ))}
+          {projectResults.map((aProject, i) => {
+            const githubUrl = aProject.properties?.['Github']?.url;
+
+            return (
+              <div
+                key={aProject.id}
+                onClick={() => {
+                  if (githubUrl) {
+                    window.open(githubUrl, '_blank');
+                  } else {
+                    handleProjectClick(i + 1);
+                  }
+                }}
+                style={{ cursor: 'pointer' }}
+              >
+                <ProjectItem data={aProject} />
+              </div>
+            );
+          })}
         </div>
       </div>
-      <CustomContentContainer 
-        show={showContent} 
+      <CustomContentContainer
+        show={showContent}
         onClose={handleClose}
         projectId={currentProjectId}
       />

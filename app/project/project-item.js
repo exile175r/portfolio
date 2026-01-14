@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export default function ProjectItem({data}){
+export default function ProjectItem({ data }) {
   // 데이터 구조 검증
   if (!data || !data.cover || !data.properties) {
     return (
@@ -13,24 +13,27 @@ export default function ProjectItem({data}){
   // 안전한 데이터 추출
   const imgSrc = data.cover?.file?.url || data.cover?.external?.url || '/placeholder-image.jpg';
   const prop = data.properties || {};
-  
+
   // 이름 추출 (안전하게)
   const title = prop.이름?.title?.[0]?.plain_text || '제목 없음';
-  
+
   // AI 요약 추출 (안전하게)
   const summation = prop['AI 요약']?.rich_text?.[0]?.plain_text || '요약 정보가 없습니다.';
-  
+
   // AI 키워드 추출 (안전하게)
   const keywords = prop['AI 키워드']?.multi_select || [];
+
+  // 외부 링크 URL 추출
+  const githubUrl = prop['Github']?.url || '';
 
   return (
     <div className="flex flex-col h-full rounded-xl projectItem">
       <div className="relative w-full h-[300px]">
-        <Image 
+        <Image
           className="rounded-t-xl"
           src={imgSrc}
           fill
-          style={{ objectFit: 'cover' }}
+          style={{ border: '1px solid rgba(0, 0, 0, .5)', objectFit: 'cover' }}
           alt="project cover image"
           priority
           unoptimized
