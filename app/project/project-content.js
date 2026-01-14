@@ -64,14 +64,37 @@ export default function ProjectContent({ projects }) {
         <div className="py-6 px-6 grid grid-cols-1 gap-8 md:grid-cols-2 w-full lg:grid-cols-3">
           {projectResults.map((aProject, i) => {
             const prop = aProject.properties || {};
-            const githubUrl = prop['Github']?.url ||
-              prop['github']?.url ||
-              prop['URL']?.url ||
-              prop['url']?.url ||
-              prop['Github']?.rich_text?.[0]?.plain_text ||
-              prop['github']?.rich_text?.[0]?.plain_text ||
-              prop['URL']?.rich_text?.[0]?.plain_text ||
-              prop['url']?.rich_text?.[0]?.plain_text;
+
+            // 외부 링크 탐색 매니저 (ProjectItem과 로직 통일)
+            const getProjectUrl = (properties) => {
+              const getVal = (p) => {
+                if (!p) return null;
+                const v = p.url || p.rich_text?.[0]?.plain_text || p.title?.[0]?.plain_text || p.files?.[0]?.file?.url || p.files?.[0]?.external?.url || null;
+                if (typeof v === 'string' && (v.trim().startsWith('http') || v.trim().startsWith('www'))) {
+                  const t = v.trim();
+                  return t.startsWith('www') ? `https://${t}` : t;
+                }
+                return null;
+              };
+              const keys = ['Github', 'github', 'GITHUB', 'URL', 'url', 'Link', 'link', 'Git', 'git', 'Pages', 'pages', 'Site', 'site'];
+              for (const k of keys) {
+                const u = getVal(properties[k]);
+                if (u) return u;
+              }
+              for (const key in properties) {
+                if (keys.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+                  const u = getVal(properties[key]);
+                  if (u) return u;
+                }
+              }
+              return null;
+            };
+
+            const githubUrl = getProjectUrl(prop);
+
+            // 디버깅용 로그
+            if (i === 0) console.log('첫 번째 프로젝트 데이터 예시:', prop);
+            if (githubUrl) console.log(`프로젝트 [${i}] 외부 링크 감지됨:`, githubUrl);
 
             return (
               <div

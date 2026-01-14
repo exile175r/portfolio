@@ -23,12 +23,43 @@ export default function ProjectItem({ data }) {
   // AI 키워드 추출 (안전하게)
   const keywords = prop['AI 키워드']?.multi_select || [];
 
-  // 외부 링크 URL 추출 (다양한 속성 이름 및 데이터 유형 대응)
+  // 외부 링크 URL 추출 (모든 노션 속성 유형 및 속성명 대응)
   const getUrl = (p) => {
     if (!p) return null;
-    return p.url || p.rich_text?.[0]?.plain_text || null;
+    const val = p.url ||
+      p.rich_text?.[0]?.plain_text ||
+      p.title?.[0]?.plain_text ||
+      p.files?.[0]?.file?.url ||
+      p.files?.[0]?.external?.url || null;
+
+    if (typeof val === 'string') {
+      const trimmed = val.trim();
+      if (trimmed.startsWith('http') || trimmed.startsWith('www')) {
+        return trimmed.startsWith('www') ? `https://${trimmed}` : trimmed;
+      }
+    }
+    return null;
   };
-  const githubUrl = getUrl(prop['Github']) || getUrl(prop['github']) || getUrl(prop['URL']) || getUrl(prop['url']) || '';
+
+  // 가능한 모든 속성명 후보군 탐색
+  const findUrlInProps = (properties) => {
+    const keywords = ['Github', 'github', 'GITHUB', 'URL', 'url', 'Link', 'link', 'Git', 'git', 'Pages', 'pages', 'Site', 'site'];
+    // 1. 명시적인 매칭 우선
+    for (const key of keywords) {
+      const url = getUrl(properties[key]);
+      if (url) return url;
+    }
+    // 2. 검색어 포함 매칭 (예: "Github URL", "배포링크" 등)
+    for (const key in properties) {
+      if (keywords.some(k => key.toLowerCase().includes(k.toLowerCase()))) {
+        const url = getUrl(properties[key]);
+        if (url) return url;
+      }
+    }
+    return '';
+  };
+
+  const githubUrl = findUrlInProps(prop);
 
   return (
     <div className="flex flex-col h-full rounded-xl projectItem">
