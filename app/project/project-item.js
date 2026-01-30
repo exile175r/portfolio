@@ -68,7 +68,7 @@ export default function ProjectItem({ data }) {
           className="rounded-t-xl"
           src={imgSrc}
           fill
-          style={{ border: '1px solid rgba(0, 0, 0, .5)', objectFit: 'cover' }}
+          style={{ objectFit: 'cover', border: '1px solid rgba(0, 0, 0, .5)' }}
           alt="project cover image"
           priority
           unoptimized

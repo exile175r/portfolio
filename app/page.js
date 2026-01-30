@@ -21,8 +21,9 @@ export default function Home() {
             유아 및 초등학생을 위한 교육 콘텐츠 개발 경험을 바탕으로 제작되었습니다.
             프로젝트의 상세 내용은 Project 페이지에서 확인해 주시기 바랍니다.
           </p>
-          <div className="flex justify-center">
-            <Link href="/project" className="inline-flex text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">프로젝트 보러가기</Link>
+          <div className="flex justify-center md:justify-start gap-4">
+            <Link href="/project" className="inline-flex text-white bg-indigo-500 border-0 py-2 px-3 focus:outline-none hover:bg-indigo-600 rounded text-lg">프로젝트 보러가기</Link>
+            <Link href="https://github.com/exile175r/portfolio" target="_blank" className="inline-flex text-white bg-indigo-500 border-0 py-2 px-3 focus:outline-none hover:bg-indigo-600 rounded text-lg">GitHub Link</Link>
           </div>
         </div>
         <div className="lg:max-w-lg lg:w-full md:w-1/2 w-5/6">
